@@ -1,0 +1,32 @@
+{
+  "name": "chat-app",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev:web": "turbo -F web dev",
+    "dev:server": "turbo -F server dev",
+    "db:push": "turbo -F @chat-app/db db:push",
+    "db:studio": "turbo -F @chat-app/db db:studio",
+    "db:generate": "turbo -F @chat-app/db db:generate",
+    "db:migrate": "turbo -F @chat-app/db db:migrate"
+  },
+  "dependencies": {
+    "@chat-app/env": "workspace:*",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@chat-app/config": "workspace:*",
+    "@types/node": "catalog:",
+    "turbo": "^2.8.12",
+    "typescript": "catalog:"
+  },
+  "packageManager": "pnpm@10.30.3"
+}

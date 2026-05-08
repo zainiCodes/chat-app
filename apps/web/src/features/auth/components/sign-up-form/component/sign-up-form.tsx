@@ -155,7 +155,7 @@ export default function SignUpForm() {
 
       <CardFooter className="flex justify-center">
         <p>
-          Already have an account? <Link to="/" className="text-[#7879EF] font-bold cursor-pointer hover:underline">Sign In</Link>
+          Already have an account? <Link to="/login" className="text-[#7879EF] font-bold cursor-pointer hover:underline">Sign In</Link>
         </p>
       </CardFooter>
     </Card>

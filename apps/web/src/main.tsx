@@ -1,15 +1,18 @@
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { RouterProvider, createRouter, redirect } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
 import { Spinner } from "@chat-app/ui/components/spinner"
 import { routeTree } from "./routeTree.gen";
 import { authClient } from "./lib/auth-client";
+import NotFoundPage from "./not-found";
 
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",
   scrollRestoration: true,
   defaultPendingComponent: () => <Spinner />,
-  context: {}
+  defaultNotFoundComponent: () => <NotFoundPage />,
+  context: {},
+
 });
 
 declare module "@tanstack/react-router" {

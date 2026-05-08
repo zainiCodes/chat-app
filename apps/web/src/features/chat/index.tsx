@@ -1,4 +1,4 @@
-import { Route } from "@/routes/chat"
+import { Route } from "@/routes/index"
 export function ChatComponet() {
     const auth = Route.useRouteContext()
     return <div>Hello {auth.session.user.name}</div>

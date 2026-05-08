@@ -26,7 +26,7 @@ export default function LoginForm() {
         {
           onSuccess: () => {
             navigate({
-              to: "/chat",
+              to: "/",
             });
             toast.success("Sign in successful");
           },

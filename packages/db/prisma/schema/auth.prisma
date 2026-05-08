@@ -1,15 +1,34 @@
 model User {
-  id            String    @id
-  name          String
+  id            String  @id
+  name          String  @db.VarChar(100)
   email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+  emailVerified Boolean @default(false)
+  image         String? @db.VarChar(500)
+
+  // ── App-specific profile fields ──────────────────────────────────────────
+  bio        String?   @db.VarChar(300)
+  isOnline   Boolean   @default(false)
+  lastSeenAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // ── BetterAuth relations ─────────────────────────────────────────────────
+  sessions Session[]
+  accounts Account[]
+
+  // ── App relations (back-refs needed by schema.prisma models) ─────────────
+  sentMessages          Message[]                 @relation("MessageSender")
+  friendshipsSent       Friendship[]              @relation("FriendRequester")
+  friendshipsReceived   Friendship[]              @relation("FriendReceiver")
+  conversations         ConversationParticipant[]
+  notificationsSent     Notification[]            @relation("NotificationSender")
+  notificationsReceived Notification[]            @relation("NotificationReceiver")
+  messageReads          MessageRead[]
+  reactions             MessageReaction[]
 
   @@unique([email])
+  @@index([createdAt])
   @@map("user")
 }
 

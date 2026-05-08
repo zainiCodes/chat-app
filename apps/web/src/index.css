@@ -1,2 +1,3 @@
 @import "@chat-app/ui/globals.css";
 @source "../node_modules/streamdown/dist/*.js";
+@source "../../../packages/ui/src/**/*.{tsx,ts}";

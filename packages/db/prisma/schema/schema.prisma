@@ -1,10 +1,218 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated"
+  provider     = "prisma-client"
+  output       = "../generated"
   moduleFormat = "esm"
-  runtime = "nodejs"
+  runtime      = "nodejs"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  BLOCKED
+}
+
+enum ConversationType {
+  DIRECT
+  GROUP
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VOICE
+}
+
+enum NotificationType {
+  FRIEND_REQUEST
+  MESSAGE
+  SYSTEM
+}
+
+enum ParticipantRole {
+  ADMIN
+  MEMBER
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// USER  →  defined in auth.prisma (single source of truth)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FRIENDSHIP
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Friendship {
+  id          String           @id @default(cuid())
+  requesterId String
+  receiverId  String
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  requester User @relation("FriendRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  receiver  User @relation("FriendReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, receiverId])
+  // FIX: added composite indexes for common queries
+  @@index([receiverId, status]) // "show my pending friend requests"
+  @@index([requesterId, status]) // "show requests I sent"
+  @@index([updatedAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONVERSATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Conversation {
+  id          String           @id @default(cuid())
+  type        ConversationType
+  // FIX: added group chat metadata fields
+  name        String?          @db.VarChar(100) // required for GROUP
+  avatarUrl   String?          @db.VarChar(500)
+  description String?          @db.VarChar(500)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt // FIX: was missing
+  // FIX: removed circular lastMessageId FK — derive at query time instead:
+  //   prisma: messages: { orderBy: { seq: 'desc' }, take: 1 }
+
+  participants ConversationParticipant[]
+  messages     Message[]                 @relation("ConversationMessages")
+
+  @@index([type])
+  @@index([updatedAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONVERSATION PARTICIPANT
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ConversationParticipant {
+  id             String          @id @default(cuid())
+  conversationId String
+  userId         String
+  role           ParticipantRole @default(MEMBER) // FIX: admin/member support
+  joinedAt       DateTime        @default(now())
+  leftAt         DateTime? // FIX: soft-leave instead of hard delete
+  mutedUntil     DateTime? // FIX: per-user mute support
+  // Tracks the last message this user has seen (for unread count)
+  lastReadSeq    BigInt?
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId, leftAt]) // "conversations this user is active in"
+  @@index([conversationId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MESSAGE
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Message {
+  // FIX: seq is a BigInt autoincrement used as the cursor for keyset pagination.
+  // Use seq instead of OFFSET for "load 50 messages before seq X".
+  seq            BigInt      @default(autoincrement())
+  id             String      @id @default(cuid())
+  conversationId String
+  senderId       String
+  type           MessageType
+  // FIX: text content capped; media stored as URL + mimeType, not raw bytes
+  content        String?     @db.VarChar(4000) // null for IMAGE / VOICE
+  mediaUrl       String?     @db.VarChar(500) // signed URL for IMAGE / VOICE
+  mimeType       String?     @db.VarChar(100) // e.g. "image/jpeg", "audio/ogg"
+  // Optional: reply threading
+  replyToId      String?
+  // FIX: soft-delete & edit tracking
+  isDeleted      Boolean     @default(false)
+  deletedAt      DateTime?
+  editedAt       DateTime?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  conversation Conversation      @relation("ConversationMessages", fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User              @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  replyTo      Message?          @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies      Message[]         @relation("MessageReplies")
+  reads        MessageRead[]
+  reactions    MessageReaction[]
+
+  // FIX: critical indexes for all common chat queries
+  @@index([conversationId, seq]) // "load messages in conversation, paginated"
+  @@index([conversationId, createdAt]) // alternative time-based sort
+  @@index([senderId]) // "messages by user"
+  @@index([replyToId]) // "replies to a message"
+  @@index([isDeleted])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MESSAGE READ RECEIPT
+// ─────────────────────────────────────────────────────────────────────────────
+
+model MessageRead {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  readAt    DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@index([userId]) // "all messages read by user"
+  @@index([messageId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MESSAGE REACTION  (bonus: emoji reactions)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model MessageReaction {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String   @db.VarChar(10) // e.g. "👍", "❤️"
+  createdAt DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji]) // one reaction per emoji per user per message
+  @@index([messageId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NOTIFICATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Notification {
+  id           String           @id @default(cuid())
+  senderId     String?
+  receiverId   String
+  type         NotificationType
+  title        String           @db.VarChar(200)
+  body         String           @db.VarChar(500)
+  isRead       Boolean          @default(false)
+  // FIX: typed payload — use explicit FK refs instead of raw Json
+  // These are all optional; only the relevant one is set per notification type
+  friendshipId String?
+  messageId    String?
+  // Keep Json? only for SYSTEM type notifications with arbitrary data
+  metadata     Json?
+  createdAt    DateTime         @default(now())
+
+  sender   User? @relation("NotificationSender", fields: [senderId], references: [id], onDelete: SetNull)
+  receiver User  @relation("NotificationReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  // FIX: critical indexes for notification feed queries
+  @@index([receiverId, isRead]) // "unread notifications for user"
+  @@index([receiverId, createdAt(sort: Desc)]) // "notification feed, newest first"
+  @@index([senderId])
+  @@index([friendshipId])
+  @@index([messageId])
 }

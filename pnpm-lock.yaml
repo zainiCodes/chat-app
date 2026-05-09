@@ -121,6 +121,9 @@ importers:
       '@ai-sdk/react':
         specifier: ^3.0.3
         version: 3.0.177(react@19.2.6)(zod@4.4.3)
+      '@chat-app/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@chat-app/env':
         specifier: workspace:*
         version: link:../../packages/env

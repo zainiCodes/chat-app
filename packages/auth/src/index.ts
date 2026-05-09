@@ -11,11 +11,19 @@ export function createAuth() {
       provider: "postgresql",
     }),
 
+    user: {
+      additionalFields: {
+        username: {
+          type: "string",
+          required: true,
+        }
+      }
+    },
     trustedOrigins: [env.CORS_ORIGIN],
     emailAndPassword: {
       enabled: true,
     },
-    secret: env.BETTER_AUTH_SECRET,
+    secret: process.env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,
     advanced: {
       defaultCookieAttributes: {

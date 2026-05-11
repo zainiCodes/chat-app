@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Dialog as SheetPrimitive } from "@base-ui/react/dialog"
+import { Dialog as SheetPrimitive } from "@base-ui/react"
 
 import { cn } from "@chat-app/ui/lib/utils"
 import { Button } from "@chat-app/ui/components/button"

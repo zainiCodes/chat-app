@@ -1,12 +1,14 @@
 import { type Request, type Response } from "express"
 import prisma from "@chat-app/db"
 import { auth } from "@chat-app/auth"
+import { userSchema } from "@/spi/validators/user-schema"
 
-export async function getUser(req: Request, res: Response) {
+export async function updateUser(req: Request, res: Response) {
     try {
         const session = await auth.api.getSession({
             headers: req.headers,
         })
+
         if (!session) {
             return res.status(401).json({
                 message: "User not logged in",
@@ -14,26 +16,29 @@ export async function getUser(req: Request, res: Response) {
         }
 
         const userId = session.user.id
-
-
-        const user = await prisma.user.findUnique({
-            where: {
-                id: userId,
-            },
-            include: {
-
-            }
-        })
-
-        if (!user) {
-            return res.status(404).json({
-                message: "User not found",
+        // ✅ Validate body with Zod
+        const parsedData = userSchema.safeParse(req.body)
+        if (!parsedData.success) {
+            return res.status(400).json({
+                message: "Validation error",
+                errors: parsedData.error.flatten(),
             })
         }
 
+
+        const data = parsedData.data
+        console.log(data)
+        const updatedUser = await prisma.user.update({
+            where: {
+                id: userId,
+            },
+            data,
+        })
+
+
         return res.status(200).json({
-            message: "User fetched successfully",
-            user,
+            message: "User updated successfully",
+            user: updatedUser,
         })
     } catch (error) {
         console.error(error)

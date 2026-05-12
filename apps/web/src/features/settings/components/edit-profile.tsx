@@ -15,6 +15,9 @@ import {
 import { useForm } from "@tanstack/react-form"
 import { z } from "zod"
 import { Edit2 } from "lucide-react"
+import { useMutation } from "@tanstack/react-query"
+import getUser from "@/hooks/getUser"
+import { toast } from "sonner"
 
 const profileSchema = z.object({
     name: z.string().min(2, "Name is too short"),
@@ -27,21 +30,46 @@ const profileSchema = z.object({
 type ProfileForm = z.infer<typeof profileSchema>
 
 export default function EditProfileDialog() {
+    const { data, isLoading } = getUser()
+    const user = data?.user
     const form = useForm({
         defaultValues: {
-            name: "",
-            username: "",
-            email: "",
-            bio: "",
+            name: user?.name!,
+            username: user?.username!,
+            email: user?.email!,
+            bio: user?.bio || "",
             image: null,
         } as ProfileForm,
 
         onSubmit: async ({ value }) => {
-            console.log("Profile Data:", value)
+            console.log(value)
+            mutate(value)
         },
         validators: {
             onChange: profileSchema,
         },
+    })
+    const { mutate, isPending } = useMutation({
+        mutationFn: async (data: ProfileForm) => {
+            const response = await fetch("http://localhost:3000/api/setUser", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify(data),
+            })
+
+            if (!response.ok) {
+                throw new Error("Failed to update profile")
+            }
+
+            return response.json()
+        },
+        onSuccess: () => {
+            toast.success("Updated successfully!")
+
+        }
     })
 
     return (
@@ -177,8 +205,8 @@ export default function EditProfileDialog() {
                     </div>
 
                     {/* Submit */}
-                    <Button type="submit" className="w-full">
-                        Save Changes
+                    <Button type="submit" disabled={isPending} className="w-full">
+                        {isPending ? "Updating..." : "Update Profile"}
                     </Button>
                 </form>
             </DialogContent>

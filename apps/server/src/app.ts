@@ -3,6 +3,7 @@ import { env } from "@chat-app/env/server";
 import { toNodeHandler } from "better-auth/node";
 import cors from "cors";
 import express, { type Express } from "express";
+import { userRouter } from "./spi/routes/user/get-user";
 
 const app: Express = express();
 app.use(
@@ -21,6 +22,7 @@ app.use(express.json());
 app.get("/", (_req, res) => {
     res.status(200).send("OK");
 });
+app.use("/api", userRouter)
 
 // app.listen(3000, () => {
 //   console.log("Server is running on http://localhost:3000");

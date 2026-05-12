@@ -8,14 +8,14 @@ import {
     CardHeader,
     CardTitle,
 } from "@chat-app/ui/components/card"
-import { Circle, User, Edit2, Settings, Eye } from "lucide-react"
-
-import { Badge } from "@chat-app/ui/components/badge";
+import { Circle, User, Settings, Eye } from "lucide-react"
 import getUser from '@/hooks/getUser';
 import { Switch } from "@chat-app/ui/components/switch"
+import EditProfileDialog from './edit-profile';
+import { cn } from '@chat-app/ui/lib/utils';
 export default function UserProfile() {
-    const userData = getUser()
-
+    const { data } = getUser()
+    const userData = data?.user
     const firstLetter = userData?.name
         ? userData?.name.charAt(0).toUpperCase()
         : userData?.email
@@ -38,7 +38,7 @@ export default function UserProfile() {
                                 <div className='flex flex-col gap-2'>
                                     <h1 className='font-semibold  text-4xl'>{userData?.name}</h1>
                                     <p className='text-muted-foreground '>@{userData?.username ?? "User"} | {userData?.email}</p>
-                                    <h3 >Lorem ipsum dolor sit amet consectetur, adipisicing elit. Similique assumenda quisquam deleniti nihil officiis rerum laudantium dicta, aspernatur eveniet? Ea tempora officiis mollitia.</h3>
+                                    <h3 className={cn(!userData?.bio ? "text-red-500" : "")}>{userData?.bio || "USER BIO IS NOT SET"} </h3>
                                 </div>
                             </div>
                         </CardDescription>
@@ -56,13 +56,7 @@ export default function UserProfile() {
                                 <h4 className="text-xl">Profile Details</h4>
                             </div>
 
-                            <div className="flex items-center gap-1.5 cursor-pointer hover:bg-primary-foreground/20 p-2 rounded-full transition-colors">
-                                <h4 className="text-primary text-sm">
-                                    Edit Profile
-                                </h4>
-
-                                <Edit2 className="text-primary w-4 h-4" />
-                            </div>
+                            <EditProfileDialog />
                         </CardTitle>
 
                         <CardDescription>
@@ -104,9 +98,8 @@ export default function UserProfile() {
                                     Bio
                                 </p>
 
-                                <div>
-                                    Frontend developer passionate about React,
-                                    TypeScript and modern UI design.
+                                <div className={cn(!userData?.bio && "text-red-500")}>
+                                    {userData?.bio || "USER BIO IS NOT SET"}
                                 </div>
                             </div>
                         </div>

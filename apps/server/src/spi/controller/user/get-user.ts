@@ -1,21 +1,47 @@
 import { type Request, type Response } from "express"
 import prisma from "@chat-app/db"
+import { auth } from "@chat-app/auth"
 
 export async function getUser(req: Request, res: Response) {
     try {
-        const { id } = req.body;
-        if (!id) {
-            res.status(400).json({ message: "User ID is required" });
-            return;
+        const session = await auth.api.getSession({
+            headers: req.headers,
+        })
+        console.log("from the backend ", session?.user)
+
+        if (!session) {
+            return res.status(401).json({
+                message: "User not logged in",
+            })
         }
+
+        const userId = session.user.id
+
+
         const user = await prisma.user.findUnique({
             where: {
-                id: id,
+                id: userId,
             },
-        });
+            include: {
 
-        res.status(200).json(user);
+            }
+        })
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            })
+        }
+
+        return res.status(200).json({
+            message: "User fetched successfully",
+            user,
+        })
     } catch (error) {
-        console.log(error);
+        console.error(error)
+
+        return res.status(500).json({
+            message: "Internal server error",
+        })
     }
 }

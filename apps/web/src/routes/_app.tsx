@@ -5,6 +5,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@chat-app/ui/comp
 import { Link, useLocation } from "@tanstack/react-router";
 import { authClient } from "@/lib/auth-client";
 import { SiteHeader } from "@/features/sidebarHeader/sideHeader";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 export interface RouterAppContext { }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
@@ -32,6 +33,7 @@ function AppLayout() {
     const auth = authClient.useSession()
     const location = useLocation()
     const navigate = useNavigate()
+    const queryClient = new QueryClient()
     return (
         <SidebarProvider>
             <div className="flex h-svh w-full">
@@ -44,9 +46,12 @@ function AppLayout() {
                     }} />
                 <SidebarInset>
                     <SiteHeader />
-                    <div className="flex-1 overflow-y-auto p-4 md:p-6">
-                        <Outlet />
-                    </div>
+                    <QueryClientProvider client={queryClient}>
+                        <div className="flex-1 overflow-y-auto p-4 md:p-6">
+                            <Outlet />
+                        </div>
+                    </QueryClientProvider>
+
                 </SidebarInset>
             </div>
         </SidebarProvider>

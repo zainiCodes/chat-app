@@ -22,6 +22,7 @@ import {
     DialogTrigger,
 } from "@chat-app/ui/components/dialog"
 import { Button } from "../button"
+import { cn } from "@chat-app/ui/lib/utils"
 const navItems = [
     {
         id: 1,
@@ -65,10 +66,10 @@ export function AppSidebar({ renderLink, user, pathname, signOut, onLogoutRedire
             <SidebarContent>
                 <SidebarMenu >
                     {navItems.map((item) => (
-                        <SidebarMenuItem key={item.id} className={item.url === pathname ? "border-l-4 border-primary" : ""}>
+                        <SidebarMenuItem key={item.id} className={cn("mb-3", item.url === pathname ? "border-l-4 border-primary " : "")}>
                             <SidebarMenuButton isActive={item.url === pathname} render={renderLink?.(item.url)} tooltip={item.title}>
                                 {item.icon && <item.icon className={item.url === pathname ? "text-[#2629e0]" : ""} />}
-                                <span className={item.url === pathname ? "text-[#2629e0]" : ""}>{item.title}</span>
+                                <span className={cn("text-lg", item.url === pathname ? "text-[#2629e0]" : "")}>{item.title}</span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ))}
@@ -80,7 +81,7 @@ export function AppSidebar({ renderLink, user, pathname, signOut, onLogoutRedire
                                     tooltip={"logout"}
                                 >
                                     <LogOut />
-                                    <span>Logout</span>
+                                    <span className="text-lg">Logout</span>
                                 </SidebarMenuButton>
                             </DialogTrigger>
 

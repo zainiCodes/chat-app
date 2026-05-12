@@ -68,7 +68,7 @@ export function AppSidebar({ renderLink, user, pathname, signOut, onLogoutRedire
                         <SidebarMenuItem key={item.id} className={item.url === pathname ? "border-l-4 border-primary" : ""}>
                             <SidebarMenuButton isActive={item.url === pathname} render={renderLink?.(item.url)} tooltip={item.title}>
                                 {item.icon && <item.icon className={item.url === pathname ? "text-[#2629e0]" : ""} />}
-                                <span>{item.title}</span>
+                                <span className={item.url === pathname ? "text-[#2629e0]" : ""}>{item.title}</span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ))}

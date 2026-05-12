@@ -1,9 +1,10 @@
-import { Outlet, createFileRoute, createRootRouteWithContext, useNavigate } from "@tanstack/react-router";
+import { Outlet, createRootRouteWithContext, useNavigate } from "@tanstack/react-router";
 
 import { AppSidebar } from "@chat-app/ui/components/sidebar/app-sidebar";
-import { SidebarProvider, SidebarTrigger } from "@chat-app/ui/components/sidebar/sidebar"
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@chat-app/ui/components/sidebar/sidebar"
 import { Link, useLocation } from "@tanstack/react-router";
 import { authClient } from "@/lib/auth-client";
+import { SiteHeader } from "@/features/sidebarHeader/sideHeader";
 export interface RouterAppContext { }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
@@ -33,7 +34,7 @@ function AppLayout() {
     const navigate = useNavigate()
     return (
         <SidebarProvider>
-            <div className="flex h-svh">
+            <div className="flex h-svh w-full">
                 <AppSidebar renderLink={(url) => <Link to={url} />}
                     user={auth.data?.user} pathname={location.pathname} signOut={() => { authClient.signOut() }}
                     onLogoutRedirect={() => {
@@ -41,10 +42,12 @@ function AppLayout() {
                             to: "/login",
                         })
                     }} />
-                <SidebarTrigger />
-                <main className="flex-1 overflow-y-auto">
-                    <Outlet />
-                </main>
+                <SidebarInset>
+                    <SiteHeader />
+                    <div className="flex-1 overflow-y-auto p-4 md:p-6">
+                        <Outlet />
+                    </div>
+                </SidebarInset>
             </div>
         </SidebarProvider>
     );

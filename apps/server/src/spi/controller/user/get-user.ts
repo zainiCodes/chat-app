@@ -20,9 +20,6 @@ export async function getUser(req: Request, res: Response) {
             where: {
                 id: userId,
             },
-            include: {
-
-            }
         })
 
         if (!user) {

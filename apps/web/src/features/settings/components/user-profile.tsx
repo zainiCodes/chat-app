@@ -1,20 +1,19 @@
 import React from 'react'
 import {
     Card,
-    CardAction,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@chat-app/ui/components/card"
 import { Circle, User, Settings, Eye } from "lucide-react"
-import getUser from '@/hooks/getUser';
+import useUser from '@/hooks/useUser';
 import { Switch } from "@chat-app/ui/components/switch"
 import EditProfileDialog from './edit-profile';
 import { cn } from '@chat-app/ui/lib/utils';
+import { Skeleton } from 'boneyard-js/react';
 export default function UserProfile() {
-    const { data } = getUser()
+    const { data, isLoading } = useUser()
     const userData = data?.user
     const firstLetter = userData?.name
         ? userData?.name.charAt(0).toUpperCase()
@@ -27,24 +26,27 @@ export default function UserProfile() {
                 <Card className='@container/card'>
                     <CardHeader>
                         <CardDescription>
-                            <div className='p-5 flex items-center gap-10'>
-                                <div className="flex h-25 w-25 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground overflow-hidden">
-                                    {userData?.image ? (
-                                        <img src={userData.image} alt={userData.name ?? "User"} className="h-full w-full object-cover" />
-                                    ) : (
-                                        <span className="font-semibold text-3xl">{firstLetter}</span>
-                                    )}
+                            <Skeleton loading={isLoading}>
+                                <div className='p-5 flex items-center gap-10'>
+                                    <div className="flex h-25 w-25 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground overflow-hidden">
+                                        {userData?.image ? (
+                                            <img src={userData.image} alt={userData.name ?? "User"} className="h-full w-full object-cover" />
+                                        ) : (
+                                            <span className="font-semibold text-3xl">{firstLetter}</span>
+                                        )}
+                                    </div>
+                                    <div className='flex flex-col gap-2'>
+                                        <h1 className='font-semibold  text-4xl'>{userData?.name}</h1>
+                                        <p className='text-muted-foreground '>@{userData?.username ?? "User"} | {userData?.email}</p>
+                                        <h3 className={cn(!userData?.bio ? "text-red-500" : "")}>{userData?.bio || "USER BIO IS NOT SET"} </h3>
+                                    </div>
                                 </div>
-                                <div className='flex flex-col gap-2'>
-                                    <h1 className='font-semibold  text-4xl'>{userData?.name}</h1>
-                                    <p className='text-muted-foreground '>@{userData?.username ?? "User"} | {userData?.email}</p>
-                                    <h3 className={cn(!userData?.bio ? "text-red-500" : "")}>{userData?.bio || "USER BIO IS NOT SET"} </h3>
-                                </div>
-                            </div>
+                            </Skeleton>
                         </CardDescription>
 
                     </CardHeader>
                 </Card>
+
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 py-5 gap-4 px-4 ">
@@ -175,5 +177,6 @@ export default function UserProfile() {
             </Card> */}
 
         </div>
+
     )
 }

@@ -16,7 +16,7 @@ export type GetUserResponse = {
     user: User
 }
 
-export default function getUser() {
+export default function useUser() {
     const { data, isPending, isLoading, error } = useQuery<GetUserResponse>({
         queryKey: ["user"],
         queryFn: async () => {
@@ -32,6 +32,7 @@ export default function getUser() {
 
             return data
         },
+        staleTime: 1000 * 60 * 5,
     })
 
     return { data, isPending, error, isLoading }

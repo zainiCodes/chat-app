@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 
 import { Button } from "@chat-app/ui/components/button"
 import { Label } from "@chat-app/ui/components/label"
@@ -15,8 +15,8 @@ import {
 import { useForm } from "@tanstack/react-form"
 import { z } from "zod"
 import { Edit2 } from "lucide-react"
-import { useMutation } from "@tanstack/react-query"
-import getUser from "@/hooks/getUser"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import useUser from "@/hooks/useUser"
 import { toast } from "sonner"
 
 const profileSchema = z.object({
@@ -30,25 +30,37 @@ const profileSchema = z.object({
 type ProfileForm = z.infer<typeof profileSchema>
 
 export default function EditProfileDialog() {
-    const { data, isLoading } = getUser()
+    const qc = useQueryClient()
+    const { data, isLoading } = useUser()
+
     const user = data?.user
+
     const form = useForm({
         defaultValues: {
-            name: user?.name!,
-            username: user?.username!,
-            email: user?.email!,
-            bio: user?.bio || "",
+            name: "",
+            username: "",
+            email: "",
+            bio: "",
             image: null,
         } as ProfileForm,
 
         onSubmit: async ({ value }) => {
-            console.log(value)
             mutate(value)
         },
+
         validators: {
             onChange: profileSchema,
         },
     })
+
+    useEffect(() => {
+        if (user) {
+            form.setFieldValue("name", user.name)
+            form.setFieldValue("username", user.username)
+            form.setFieldValue("email", user.email)
+            form.setFieldValue("bio", user.bio || "")
+        }
+    }, [user])
     const { mutate, isPending } = useMutation({
         mutationFn: async (data: ProfileForm) => {
             const response = await fetch("http://localhost:3000/api/setUser", {
@@ -61,14 +73,18 @@ export default function EditProfileDialog() {
             })
 
             if (!response.ok) {
-                throw new Error("Failed to update profile")
+                const data: { message: string } = await response.json()
+                throw new Error(data.message)
             }
 
             return response.json()
         },
         onSuccess: () => {
             toast.success("Updated successfully!")
-
+            qc.invalidateQueries({ queryKey: ["user"] })
+        },
+        onError: (error) => {
+            toast.error(error.message)
         }
     })
 
@@ -85,6 +101,7 @@ export default function EditProfileDialog() {
                 </div>
 
             </DialogTrigger>
+
 
             <DialogContent className="max-w-lg">
                 <DialogHeader>
@@ -210,6 +227,6 @@ export default function EditProfileDialog() {
                     </Button>
                 </form>
             </DialogContent>
-        </Dialog>
+        </Dialog >
     )
 }

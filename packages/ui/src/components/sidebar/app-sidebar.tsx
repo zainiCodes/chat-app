@@ -44,6 +44,7 @@ const navItems = [
     }
 ]
 
+
 type AppSidebarProps = {
     renderLink?: (url: string) => React.ReactElement
     user?: SidebarUser | null

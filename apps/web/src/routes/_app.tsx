@@ -6,6 +6,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { authClient } from "@/lib/auth-client";
 import { SiteHeader } from "@/features/sidebarHeader/sideHeader";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import useUser from "@/hooks/useUser";
 export interface RouterAppContext { }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
@@ -28,17 +29,18 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         ],
     }),
 });
+const queryClient = new QueryClient()
 
 function AppLayout() {
     const auth = authClient.useSession()
+    const user = auth.data?.user
     const location = useLocation()
     const navigate = useNavigate()
-    const queryClient = new QueryClient()
     return (
         <SidebarProvider>
             <div className="flex h-svh w-full">
                 <AppSidebar renderLink={(url) => <Link to={url} />}
-                    user={auth.data?.user} pathname={location.pathname} signOut={() => { authClient.signOut() }}
+                    user={user} pathname={location.pathname} signOut={() => { authClient.signOut() }}
                     onLogoutRedirect={() => {
                         navigate({
                             to: "/login",

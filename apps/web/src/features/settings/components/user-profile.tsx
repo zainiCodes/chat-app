@@ -12,6 +12,7 @@ import { Switch } from "@chat-app/ui/components/switch"
 import EditProfileDialog from './edit-profile';
 import { cn } from '@chat-app/ui/lib/utils';
 import { Skeleton } from 'boneyard-js/react';
+import SettingsSkeleton from '@/helper-component/skeletons/setting-skeleton';
 export default function UserProfile() {
     const { data, isLoading } = useUser()
     const userData = data?.user
@@ -20,6 +21,10 @@ export default function UserProfile() {
         : userData?.email
             ? userData?.email.charAt(0).toUpperCase()
             : 'U'
+
+    if (isLoading) {
+        return <SettingsSkeleton />
+    }
     return (
         <div>
             <div className="grid grid-cols-1 gap-4 px-4 ">

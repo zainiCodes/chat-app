@@ -24,16 +24,6 @@ export async function updateUser(req: Request, res: Response) {
                 errors: parsedData.error.flatten(),
             })
         }
-        const duplicatieUser = await prisma.user.findFirst({
-            where: {
-                username: parsedData.data.username
-            }
-        })
-        if (duplicatieUser && duplicatieUser.id !== userId) {
-            return res.status(400).json({
-                message: "Username already exists",
-            })
-        }
 
         const data = parsedData.data
         console.log(data)

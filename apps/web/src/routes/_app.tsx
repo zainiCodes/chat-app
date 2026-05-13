@@ -4,8 +4,7 @@ import { AppSidebar } from "@chat-app/ui/components/sidebar/app-sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@chat-app/ui/components/sidebar/sidebar"
 import { Link, useLocation } from "@tanstack/react-router";
 import { authClient } from "@/lib/auth-client";
-import { SiteHeader } from "@/features/sidebarHeader/sideHeader";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SiteHeader } from "@/helper-component/sidebarHeader/sideHeader";
 import useUser from "@/hooks/useUser";
 export interface RouterAppContext { }
 
@@ -29,11 +28,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         ],
     }),
 });
-const queryClient = new QueryClient()
 
 function AppLayout() {
     const auth = authClient.useSession()
-    const user = auth.data?.user
+    const { data: userData } = useUser()
+    const user = userData?.user || auth.data?.user
     const location = useLocation()
     const navigate = useNavigate()
     return (
@@ -48,12 +47,9 @@ function AppLayout() {
                     }} />
                 <SidebarInset>
                     <SiteHeader />
-                    <QueryClientProvider client={queryClient}>
-                        <div className="flex-1 overflow-y-auto p-4 md:p-6">
-                            <Outlet />
-                        </div>
-                    </QueryClientProvider>
-
+                    <div className="flex-1 overflow-y-auto p-4 md:p-6">
+                        <Outlet />
+                    </div>
                 </SidebarInset>
             </div>
         </SidebarProvider>

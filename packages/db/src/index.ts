@@ -1,6 +1,5 @@
 import { env } from "@chat-app/env/server";
 import { PrismaPg } from "@prisma/adapter-pg";
-
 import { PrismaClient } from "../prisma/generated/client";
 
 export function createPrismaClient() {

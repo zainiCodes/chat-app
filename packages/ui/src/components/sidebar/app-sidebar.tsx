@@ -8,7 +8,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "./sidebar"
-import { Bell, MessageSquare, Settings } from "lucide-react"
+import { Bell, MessageSquare, Settings, Users2 } from "lucide-react"
 import Header, { type SidebarUser } from "./sidebar-header"
 import { Separator } from "../separator"
 
@@ -23,12 +23,18 @@ const navItems = [
     },
     {
         id: 2,
+        title: "Friends",
+        icon: Users2,
+        url: "/friends"
+    },
+    {
+        id: 3,
         title: "Notification",
         url: "/notification",
         icon: Bell
     },
     {
-        id: 3,
+        id: 4,
         title: "Settings",
         icon: Settings,
         url: "/settings"
@@ -67,44 +73,6 @@ export function AppSidebar({ renderLink, user, pathname, signOut, onLogoutRedire
                     ))}
                     <SidebarMenuItem>
                         <Logout logout={handleLogout} />
-                        {/* <Dialog >
-                            <DialogTrigger className="w-full">
-                                <SidebarMenuButton
-                                    className="text-red-500 hover:text-red-600"
-                                    tooltip={"logout"}
-                                >
-                                    <LogOut />
-                                    <span className="text-lg">Logout</span>
-                                </SidebarMenuButton>
-                            </DialogTrigger>
-
-                            <DialogContent>
-                                <DialogHeader className="flex flex-col items-center">
-                                    <LogOut className="text-red-500 text-center w-full text-2xl my-3" />
-                                    <DialogTitle className="text-center w-full mb-3">Logout</DialogTitle>
-
-                                    <DialogDescription>
-
-                                        Are you sure you want to logout?
-                                    </DialogDescription>
-                                </DialogHeader>
-
-                                <DialogFooter>
-                                    <DialogClose>
-                                        <button className="border rounded-md px-4 py-2">
-                                            Cancel
-                                        </button>
-                                    </DialogClose>
-
-                                    <Button
-                                        onClick={handleLogout}
-                                        className="bg-red-500 text-white rounded-md px-4 py-2 hover:bg-red-600"
-                                    >
-                                        Logout
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog> */}
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarContent>

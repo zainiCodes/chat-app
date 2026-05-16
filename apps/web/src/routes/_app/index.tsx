@@ -4,7 +4,7 @@ import { ChatComponet } from "@/features/chat";
 import { authClient } from "@/lib/auth-client";
 export const Route = createFileRoute("/_app/")({
   component: ChatComponet,
-  beforeLoad: async () => {
+  loader: async () => {
     const session = await authClient.getSession();
 
     if (!session.data) {
@@ -17,5 +17,5 @@ export const Route = createFileRoute("/_app/")({
       session: session.data,
     };
   },
-
+  staleTime: 5000
 });

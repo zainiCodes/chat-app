@@ -14,6 +14,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
+import { Route as AppNotificationRouteImport } from './routes/_app/notification'
+import { Route as AppFriendsRouteImport } from './routes/_app/friends'
 
 const SignUpRoute = SignUpRouteImport.update({
   id: '/signUp',
@@ -39,16 +41,30 @@ const AppSettingsRoute = AppSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AppRoute,
 } as any)
+const AppNotificationRoute = AppNotificationRouteImport.update({
+  id: '/notification',
+  path: '/notification',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFriendsRoute = AppFriendsRouteImport.update({
+  id: '/friends',
+  path: '/friends',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof LoginRoute
   '/signUp': typeof SignUpRoute
+  '/friends': typeof AppFriendsRoute
+  '/notification': typeof AppNotificationRoute
   '/settings': typeof AppSettingsRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signUp': typeof SignUpRoute
+  '/friends': typeof AppFriendsRoute
+  '/notification': typeof AppNotificationRoute
   '/settings': typeof AppSettingsRoute
   '/': typeof AppIndexRoute
 }
@@ -57,15 +73,31 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/signUp': typeof SignUpRoute
+  '/_app/friends': typeof AppFriendsRoute
+  '/_app/notification': typeof AppNotificationRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/signUp' | '/settings'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/signUp'
+    | '/friends'
+    | '/notification'
+    | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/signUp' | '/settings' | '/'
-  id: '__root__' | '/_app' | '/login' | '/signUp' | '/_app/settings' | '/_app/'
+  to: '/login' | '/signUp' | '/friends' | '/notification' | '/settings' | '/'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/login'
+    | '/signUp'
+    | '/_app/friends'
+    | '/_app/notification'
+    | '/_app/settings'
+    | '/_app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -111,15 +143,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/notification': {
+      id: '/_app/notification'
+      path: '/notification'
+      fullPath: '/notification'
+      preLoaderRoute: typeof AppNotificationRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/friends': {
+      id: '/_app/friends'
+      path: '/friends'
+      fullPath: '/friends'
+      preLoaderRoute: typeof AppFriendsRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppFriendsRoute: typeof AppFriendsRoute
+  AppNotificationRoute: typeof AppNotificationRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppFriendsRoute: AppFriendsRoute,
+  AppNotificationRoute: AppNotificationRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppIndexRoute: AppIndexRoute,
 }

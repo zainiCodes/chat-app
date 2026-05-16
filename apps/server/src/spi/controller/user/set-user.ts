@@ -2,6 +2,7 @@ import { type Request, type Response } from "express"
 import prisma from "@chat-app/db"
 import { auth } from "@chat-app/auth"
 import { userSchema } from "@/spi/validators/user-schema"
+import cloudinary from "@/lib/cloudinary"
 
 export async function updateUser(req: Request, res: Response) {
     try {
@@ -18,6 +19,7 @@ export async function updateUser(req: Request, res: Response) {
         const userId = session.user.id
         // ✅ Validate body with Zod
         const parsedData = userSchema.safeParse(req.body)
+
         if (!parsedData.success) {
             return res.status(400).json({
                 message: "Validation error",
@@ -26,7 +28,12 @@ export async function updateUser(req: Request, res: Response) {
         }
 
         const data = parsedData.data
-        console.log(data)
+        if (data.image) {
+            const result = await cloudinary.uploader.upload(data.image, {
+                folder: "chat-app",
+            });
+            data.image = result.secure_url
+        }
         const updatedUser = await prisma.user.update({
             where: {
                 id: userId,

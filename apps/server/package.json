@@ -17,6 +17,7 @@
     "@chat-app/env": "workspace:*",
     "ai": "catalog:",
     "better-auth": "catalog:",
+    "cloudinary": "^2.10.0",
     "cors": "^2.8.5",
     "dotenv": "catalog:",
     "express": "^5.1.0",

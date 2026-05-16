@@ -17,7 +17,9 @@ app.use(
 
 app.all("/api/auth{/*path}", toNodeHandler(auth));
 
-app.use(express.json());
+// ONLY THIS (important)
+app.use(express.json({ limit: "10mb" }))
+app.use(express.urlencoded({ extended: true, limit: "10mb" }))
 
 app.get("/", (_req, res) => {
     res.status(200).send("OK");

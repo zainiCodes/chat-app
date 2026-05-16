@@ -23,8 +23,8 @@ const profileSchema = z.object({
     name: z.string().min(2, "Name is too short"),
     username: z.string().min(3, "Username is too short"),
     email: z.string().email("Invalid email"),
-    bio: z.string().min(5, "Bio is too short"),
-    image: z.any().optional(),
+    bio: z.string(),
+    image: z.string().optional(),
 })
 
 type ProfileForm = z.infer<typeof profileSchema>
@@ -41,7 +41,7 @@ export default function EditProfileDialog() {
             username: "",
             email: "",
             bio: "",
-            image: null,
+            image: "",
         } as ProfileForm,
 
         onSubmit: async ({ value }) => {
@@ -88,6 +88,19 @@ export default function EditProfileDialog() {
         }
     })
 
+    const toBase64 = (file: File): Promise<string> => { // this is only for converting image to string
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader()
+
+            reader.readAsDataURL(file)
+
+            reader.onload = () => {
+                resolve(reader.result as string)
+            }
+
+            reader.onerror = (error) => reject(error)
+        })
+    }
     return (
         <Dialog>
 
@@ -205,22 +218,28 @@ export default function EditProfileDialog() {
                     </form.Field>
 
                     {/* Image */}
-                    <div className="space-y-1">
-                        <Label>Profile Picture</Label>
-                        <form.Field
-                            name="image"
-                            children={(field) => (
+                    <form.Field name="image">
+                        {(field) => (
+                            <div className="space-y-2">
+                                <Label htmlFor={field.name}>
+                                    Upload profile picture
+                                </Label>
                                 <Input
+                                    id="image"
                                     type="file"
-                                    accept="image/*"
-                                    onChange={(e) =>
-                                        field.handleChange(e.target.files?.[0] || null)
-                                    }
-                                />
-                            )}
-                        />
-                    </div>
+                                    accept="image/png,image/jpeg,image/jpg"
+                                    onChange={async (e) => {
+                                        const file = e.target.files?.[0]
+                                        if (!file) return
 
+                                        const base64 = await toBase64(file)
+
+                                        field.handleChange(base64)
+                                    }}
+                                />
+                            </div>
+                        )}
+                    </form.Field>
                     {/* Submit */}
                     <Button type="submit" disabled={isPending} className="w-full">
                         {isPending ? "Updating..." : "Update Profile"}

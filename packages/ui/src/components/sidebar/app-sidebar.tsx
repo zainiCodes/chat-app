@@ -8,21 +8,12 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "./sidebar"
-import { Bell, LogOut, MessageSquare, Settings } from "lucide-react"
+import { Bell, MessageSquare, Settings } from "lucide-react"
 import Header, { type SidebarUser } from "./sidebar-header"
 import { Separator } from "../separator"
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@chat-app/ui/components/dialog"
-import { Button } from "../button"
+
 import { cn } from "@chat-app/ui/lib/utils"
+import { Logout } from "./logout-dialog"
 const navItems = [
     {
         id: 1,
@@ -75,7 +66,8 @@ export function AppSidebar({ renderLink, user, pathname, signOut, onLogoutRedire
                         </SidebarMenuItem>
                     ))}
                     <SidebarMenuItem>
-                        <Dialog >
+                        <Logout logout={handleLogout} />
+                        {/* <Dialog >
                             <DialogTrigger className="w-full">
                                 <SidebarMenuButton
                                     className="text-red-500 hover:text-red-600"
@@ -112,7 +104,7 @@ export function AppSidebar({ renderLink, user, pathname, signOut, onLogoutRedire
                                     </Button>
                                 </DialogFooter>
                             </DialogContent>
-                        </Dialog>
+                        </Dialog> */}
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarContent>

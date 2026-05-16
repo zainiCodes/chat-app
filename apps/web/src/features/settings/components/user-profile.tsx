@@ -25,6 +25,7 @@ export default function UserProfile() {
     if (isLoading) {
         return <SettingsSkeleton />
     }
+
     return (
         <div>
             <div className="grid grid-cols-1 gap-4 px-4 ">
@@ -130,7 +131,7 @@ export default function UserProfile() {
                                 <span className="text-sm font-medium">Online Status</span>
                             </div>
 
-                            <Switch defaultChecked />
+                            <Switch checked={userData?.isOnline} />
                         </div>
 
                         <div className="flex items-center justify-between">

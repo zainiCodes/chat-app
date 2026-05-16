@@ -1,10 +1,17 @@
 import { Button } from "../button"
+import {
+    Avatar,
+    AvatarImage,
+    AvatarFallback,
+    AvatarBadge,
+} from "@chat-app/ui/components/avatar"
 
 export type SidebarUser = {
     username?: string | null,
     name?: string | null
     email?: string | null
     image?: string | null
+    isOnline?: boolean
 }
 interface HeaderProps {
     user?: SidebarUser | null
@@ -35,13 +42,22 @@ export default function Header({ user }: HeaderProps) {
                     <span className="truncate font-semibold text-lg">{user.username ?? "User"}</span>
                     <span className="truncate font-medium text-xs">Online</span>
                 </div>
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground overflow-hidden">
-                    {user.image ? (
-                        <img src={user.image} alt={user.name ?? "User"} className="h-full w-full object-cover" />
-                    ) : (
-                        <span className="font-semibold text-lg">{firstLetter}</span>
-                    )}
-                </div>
+                <Avatar className="h-10 w-10">
+                    <AvatarImage
+                        src={user.image ?? undefined}
+                        alt={user.name ?? "User"}
+                    />
+
+                    <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground font-semibold">
+                        {firstLetter}
+                    </AvatarFallback>
+                    {
+                        user.isOnline && (
+                            <AvatarBadge className="bg-green-600 dark:bg-green-800" />
+                        )
+                    }
+
+                </Avatar>
             </div>
             <div className="px-1 py-5">
                 <Button className="w-full rounded-lg cursor-pointer">+ New Chat</Button>

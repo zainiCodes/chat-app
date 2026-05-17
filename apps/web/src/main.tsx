@@ -14,8 +14,10 @@ const router = createRouter({
   scrollRestoration: true,
   defaultPendingComponent: () => <Spinner />,
   defaultNotFoundComponent: () => <NotFoundPage />,
-  context: {},
-
+  context: {
+    authClient,
+    queryClient,
+  },
 });
 
 declare module "@tanstack/react-router" {

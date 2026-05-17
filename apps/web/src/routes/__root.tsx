@@ -2,8 +2,13 @@ import { Toaster } from "@chat-app/ui/components/sonner";
 import { HeadContent, Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import "../index.css";
+import { authClient } from "@/lib/auth-client";
+import { QueryClient } from "@tanstack/react-query";
 
-export interface RouterAppContext { }
+export interface RouterAppContext {
+  authClient: typeof authClient;
+  queryClient: QueryClient;
+}
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   component: RootComponent,

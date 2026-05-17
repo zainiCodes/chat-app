@@ -1,4 +1,4 @@
-import { Outlet, createRootRouteWithContext, useNavigate } from "@tanstack/react-router";
+import { Outlet, useNavigate } from "@tanstack/react-router";
 
 import { AppSidebar } from "@chat-app/ui/components/sidebar/app-sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@chat-app/ui/components/sidebar/sidebar"
@@ -6,9 +6,9 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { authClient } from "@/lib/auth-client";
 import { SiteHeader } from "@/helper-component/sidebarHeader/sideHeader";
 import useUser from "@/hooks/useUser";
-export interface RouterAppContext { }
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createRootRouteWithContext<RouterAppContext>()({
+export const Route = createFileRoute('/_app')({
     component: AppLayout,
     head: () => ({
         meta: [

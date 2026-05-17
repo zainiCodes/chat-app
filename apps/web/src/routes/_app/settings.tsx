@@ -7,7 +7,7 @@ export const Route = createFileRoute('/_app/settings')({
     component: SettingsComponent,
     pendingComponent: SettingsSkeleton, // ← replaces the generic spinner
     pendingMs: 300,
-    beforeLoad: async () => {
+    loader: async () => {
         const session = await authClient.getSession();
 
         if (!session.data) {

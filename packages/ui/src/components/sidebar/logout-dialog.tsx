@@ -46,12 +46,6 @@ export function Logout({ logout }: { logout: () => void }) {
                             </DialogDescription>
                         </DialogHeader>
 
-                        {/* Extra Info */}
-                        <div className="mt-6 rounded-2xl border bg-muted/40 p-4">
-                            <p className="text-sm text-muted-foreground">
-                                Any unsaved changes may be lost after logging out.
-                            </p>
-                        </div>
 
                         {/* Footer */}
                         <DialogFooter className="mt-8 flex-row gap-3 sm:justify-end">

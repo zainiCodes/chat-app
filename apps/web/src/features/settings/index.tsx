@@ -4,11 +4,8 @@ import UserProfile from './components/user-profile'
 export default function SettingsComponent() {
     const user = getUser()
     return (
-        <div className="container mx-auto ">
-
+        <div className="container mx-auto w-full">
             <UserProfile />
-
-
         </div >
     )
 }

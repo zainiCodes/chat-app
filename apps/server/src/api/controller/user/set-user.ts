@@ -1,7 +1,7 @@
 import { type Request, type Response } from "express"
 import prisma from "@chat-app/db"
 import { auth } from "@chat-app/auth"
-import { userSchema } from "@/spi/validators/user-schema"
+import { userSchema } from "@/api/validators/user-schema"
 import cloudinary from "@/lib/cloudinary"
 
 export async function updateUser(req: Request, res: Response) {

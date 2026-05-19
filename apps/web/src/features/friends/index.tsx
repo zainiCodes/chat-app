@@ -7,7 +7,7 @@ import { Button } from "@chat-app/ui/components/button";
 export default function FriendsComponent() {
     return (
         <div className="flex gap-4">
-            <div className="w-2/5 ">
+            <div className="w-2/5 overflow-hidden ">
                 <Field orientation="horizontal">
                     <Input type="search" placeholder="Search..." />
                     <Button>Search</Button>

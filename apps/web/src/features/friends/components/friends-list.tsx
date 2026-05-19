@@ -17,7 +17,7 @@ import {
     ScrollArea
 } from "@chat-app/ui/components/scroll-area"
 import useAllUsers from "@/hooks/useAllUsers"
-export default function FriendsList() {
+export default function FriendsList({ viewProfile }: { viewProfile: (id: string) => void }) {
     const { data } = useAllUsers()
     return (
         <div className="w-full flex flex-col gap-4 mt-6 overflow-hidden">
@@ -40,7 +40,7 @@ export default function FriendsList() {
                                     </div>
 
                                     <div className="flex items-center gap-2">
-                                        <Button variant="secondary" className="flex-1 bg-[#eef2fc] hover:bg-[#e0e8f9] text-[#1e293b] font-medium h-10">
+                                        <Button variant="secondary" onClick={() => { viewProfile(user.id) }} className="flex-1 bg-[#eef2fc] hover:bg-[#e0e8f9] text-[#1e293b] font-medium h-10">
                                             View Profile
                                         </Button>
                                         <Button className=" h-10 w-10 bg-[#4B53BC] hover:bg-[#3f46a3] shrink-0 p-0 rounded-lg">

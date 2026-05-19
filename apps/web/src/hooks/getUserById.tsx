@@ -1,13 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 type Response = {
     message: string
-    users: {
+    user: {
         id: string,
         name: string,
         email: string,
         username: string,
         image: string,
-    }[]
+        bio: string,
+        createdAt: Date,
+    }
     friendships: {
         id: string;
         requesterId: string;
@@ -16,11 +18,11 @@ type Response = {
     }[];
 }
 
-function useAllUsers() {
+function useUserById(id: string) {
     const { data, isPending, error } = useQuery<Response>({
-        queryKey: ["AllUsers"],
+        queryKey: ["UserById", id],
         queryFn: async () => {
-            const res = await fetch("http://localhost:3000/api/getAllUsers", {
+            const res = await fetch(`http://localhost:3000/api/getUserById/${id}`, {
                 credentials: "include"
             })
             if (!res.ok) {
@@ -37,4 +39,4 @@ function useAllUsers() {
     )
     return { data, isPending, error }
 }
-export default useAllUsers
+export default useUserById

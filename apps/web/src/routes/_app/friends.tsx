@@ -1,9 +1,10 @@
+import FriendsComponent from '@/features/friends';
 import { authClient } from '@/lib/auth-client';
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_app/friends')({
 
-  component: RouteComponent,
+  component: FriendsComponent,
   loader: async ({ context }) => {
     const session = await context.authClient.getSession();
 
@@ -13,7 +14,3 @@ export const Route = createFileRoute('/_app/friends')({
     return { session: session.data }
   },
 })
-
-function RouteComponent() {
-  return <div>Hello "/_app/friends"!</div>
-}

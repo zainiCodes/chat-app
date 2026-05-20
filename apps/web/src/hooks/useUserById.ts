@@ -15,7 +15,7 @@ type Response = {
         requesterId: string;
         receiverId: string;
         status: string;
-    }[];
+    };
 }
 
 function useUserById(id: string) {
@@ -34,6 +34,8 @@ function useUserById(id: string) {
             return data
         },
         staleTime: 1000 * 60 * 5,
+        enabled: !!id,
+
     }
 
     )

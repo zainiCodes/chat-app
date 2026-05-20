@@ -5,6 +5,7 @@ import cors from "cors";
 import express, { type Express } from "express";
 import { userRouter } from "./api/routes/user/get-user";
 import { friendRouter } from "./api/routes/friends/friends-list-route";
+import { friendRequestRouter } from "./api/routes/friends/friend-request-route";
 
 const app: Express = express();
 app.use(
@@ -27,10 +28,9 @@ app.get("/", (_req, res) => {
 });
 app.use("/api", userRouter)
 app.use("/api", friendRouter)
+app.use("/api", friendRequestRouter)
 
-// app.listen(3000, () => {
-//   console.log("Server is running on http://localhost:3000");
-// });
+
 
 
 export default app;

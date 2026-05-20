@@ -16,9 +16,8 @@ export async function getUserById(req: Request, res: Response) {
                 id
             }
         })
-        const friendships = await prisma.friendship.findMany({
+        const friendships = await prisma.friendship.findFirst({
             where: {
-                status: "ACCEPTED",
                 OR: [
                     { requesterId: id },
                     { receiverId: id },

@@ -23,7 +23,7 @@ const navItems = [
     },
     {
         id: 2,
-        title: "Friends",
+        title: "Make Friends",
         icon: Users2,
         url: "/friends"
     },

@@ -7,7 +7,6 @@ export default function notificationsComponent() {
             <div className="flex items-center gap-3">
                 <UserPlus className="w-5 h-5 text-indigo-700" strokeWidth={2} />
                 <h2 className="text-lg font-bold text-slate-900">Friend Requests</h2>
-                <Badge variant={"secondary"} className="rounded-full">2</Badge>
             </div>
             <div>
                 <FriendRequests />

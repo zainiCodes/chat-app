@@ -20,6 +20,7 @@ export default function FriendsProfile() {
     const userId = useContext(UserIdContext)
     const { data, isPending } = useUserById(userId)
     const queryClient = useQueryClient()
+    console.log(data)
 
     const mutation = useMutation({
         mutationFn: async () => {
@@ -61,7 +62,7 @@ export default function FriendsProfile() {
     if (!data) return null;
 
     const { user } = data;
-    const friendshipStatus = mutation.data?.friendRequest?.status || data.friendships?.status;
+    const friendshipStatus = data.friendships?.status;
 
     const memberSince = user.createdAt
         ? new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' }).format(new Date(user.createdAt))

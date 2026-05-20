@@ -1,6 +1,6 @@
-
 import { type Request, type Response } from "express"
 import { createPrismaClient } from "@chat-app/db"
+import { auth } from "@chat-app/auth"
 
 export async function getUserById(req: Request, res: Response) {
     try {
@@ -10,6 +10,17 @@ export async function getUserById(req: Request, res: Response) {
                 message: "User id is required",
             })
         }
+        
+        const session = await auth.api.getSession({
+            headers: req.headers
+        })
+        
+        if (!session) {
+            return res.status(401).json({
+                message: "User not logged in",
+            })
+        }
+
         const prisma = createPrismaClient()
         const user = await prisma.user.findUnique({
             where: {
@@ -19,8 +30,8 @@ export async function getUserById(req: Request, res: Response) {
         const friendships = await prisma.friendship.findFirst({
             where: {
                 OR: [
-                    { requesterId: id },
-                    { receiverId: id },
+                    { requesterId: id, receiverId: session.user.id },
+                    { receiverId: id, requesterId: session.user.id },
                 ],
             },
             include: {

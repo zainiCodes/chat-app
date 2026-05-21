@@ -59,6 +59,7 @@ export default function EditProfileDialog() {
             form.setFieldValue("username", user.username)
             form.setFieldValue("email", user.email)
             form.setFieldValue("bio", user.bio || "")
+            form.setFieldValue("image", user.image || "")
         }
     }, [user])
     const { mutate, isPending } = useMutation({

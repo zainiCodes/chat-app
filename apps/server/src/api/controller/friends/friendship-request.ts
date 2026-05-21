@@ -31,8 +31,22 @@ export async function FriendshipRequest(req: Request, res: Response) {
                     }
                 },
                 status: "PENDING"
+            },
+            include: {
+                requester: true
             }
         })
+        await prisma.notification.create({
+            data: {
+                type: "FRIEND_REQUEST",
+                title: "Friend Request",
+                body: `${friendRequest.requester.name} sent you a friend request.`,
+                receiverId: friendId,
+                senderId: session.user.id,
+                friendshipId: friendRequest.id
+            }
+        })
+
         return res.status(200).json({
             message: "Friend request sent successfully",
             friendRequest

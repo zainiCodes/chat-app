@@ -20,11 +20,9 @@ export default function FriendsProfile() {
     const userId = useContext(UserIdContext)
     const { data, isPending } = useUserById(userId)
     const queryClient = useQueryClient()
-    console.log(data)
-
     const mutation = useMutation({
         mutationFn: async () => {
-            const res = await fetch("http://localhost:3000/api/friendshipRequest", {
+            await fetch("http://localhost:3000/api/friendshipRequest", {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -32,8 +30,6 @@ export default function FriendsProfile() {
                 },
                 body: JSON.stringify({ friendId: userId }),
             })
-            const data = await res.json()
-            return data
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["UserById", userId] })

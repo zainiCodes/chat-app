@@ -12,9 +12,10 @@ export async function AcceptRejectRequest(req: Request, res: Response) {
                 message: "User not logged in",
             })
         }
+
         const { requestId, status }: { requestId: string, status: string } = req.body
         if (status == "ACCEPTED") {
-            await prisma.friendship.update({
+            const Friendship = await prisma.friendship.update({
                 where: {
                     id: requestId,
                     receiver: {
@@ -25,17 +26,35 @@ export async function AcceptRejectRequest(req: Request, res: Response) {
                     status: "ACCEPTED"
                 }
             })
+            await prisma.notification.deleteMany({
+                where: {
+                    receiverId: session.user.id,
+                    type: "FRIEND_REQUEST",
+                    OR: [
+                        { friendshipId: requestId },
+                        { senderId: Friendship.requesterId }
+                    ]
+                }
+            })
             return res.status(200).json({
                 message: "Friend request accepted successfully",
             })
         }
         else {
-            await prisma.friendship.delete({
+            const deletedFriendship = await prisma.friendship.delete({
                 where: {
                     id: requestId,
-                    receiver: {
-                        id: session.user.id
-                    }
+                    receiverId: session.user.id
+                }
+            })
+            await prisma.notification.deleteMany({
+                where: {
+                    receiverId: session.user.id,
+                    type: "FRIEND_REQUEST",
+                    OR: [
+                        { friendshipId: requestId },
+                        { senderId: deletedFriendship.requesterId }
+                    ]
                 }
             })
             return res.status(200).json({

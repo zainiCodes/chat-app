@@ -1,6 +1,7 @@
 import {
     Card,
     CardContent,
+    CardTitle,
 } from "@chat-app/ui/components/card"
 
 import {
@@ -12,15 +13,13 @@ import {
 import { Button } from "@chat-app/ui/components/button"
 
 import { Skeleton } from "@chat-app/ui/components/skeleton"
-
-import useAllRequests from "@/hooks/useAllRequests"
-
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { toast } from "sonner"
+import useFriendRequestNotification from "@/hooks/useFriendRequestNotification"
 
 export default function FriendRequests() {
-    const { data, isPending } = useAllRequests()
+    const { data, isPending } = useFriendRequestNotification()
 
     const queryClient = useQueryClient()
 
@@ -50,16 +49,21 @@ export default function FriendRequests() {
             if (!res.ok) {
                 throw new Error("Something went wrong")
             }
-
+            console.log("hello world")
             return res.json()
+
         },
 
-        onSuccess: () => {
+        onSuccess: (_, variables) => {
             queryClient.invalidateQueries({
-                queryKey: ["AllRequests"],
+                queryKey: ["FriendRequestNoti"],
             })
+            if (variables.status === "ACCEPTED") {
+                toast.success("Request updated successfully!")
+            } else {
+                toast.error("Request rejected!")
+            }
 
-            toast.success("Request updated successfully!")
         },
 
         onError: () => {
@@ -98,7 +102,7 @@ export default function FriendRequests() {
         )
     }
 
-    if (!data?.friendRequests?.length) {
+    if (!data?.friendRequestNotification?.length) {
         return (
             <div className="flex flex-col items-center justify-center py-12 text-center text-slate-500 bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
                 <p>No Notification to display</p>
@@ -109,7 +113,7 @@ export default function FriendRequests() {
     return (
         <div className="flex flex-col gap-4 w-full">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {data.friendRequests.map((request) => {
+                {data.friendRequestNotification.map((request) => {
                     return (
                         <Card
                             key={request.id}
@@ -119,12 +123,12 @@ export default function FriendRequests() {
                                 <div className="flex items-center gap-3">
                                     <Avatar className="w-12 h-12">
                                         <AvatarImage
-                                            src={request.requester.image}
-                                            alt={request.requester.name}
+                                            src={request.sender.image}
+                                            alt={request.sender.name}
                                         />
 
                                         <AvatarFallback>
-                                            {request.requester.name
+                                            {request.sender.name
                                                 .slice(0, 2)
                                                 .toUpperCase()}
                                         </AvatarFallback>
@@ -132,44 +136,48 @@ export default function FriendRequests() {
 
                                     <div className="flex flex-col gap-0.5">
                                         <span className="font-semibold text-sm text-slate-900">
-                                            {request.requester.name}
+                                            {request.sender.name}
                                         </span>
 
                                         <span className="text-xs text-muted-foreground">
-                                            @{request.requester.username}
+                                            @{request.sender.username}
                                         </span>
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-2">
-                                    <Button
-                                        size="sm"
-                                        className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-md px-4 h-8 font-medium"
-                                        disabled={mutation.isPending}
-                                        onClick={() =>
-                                            mutation.mutate({
-                                                requestId: request.id,
-                                                status: "ACCEPTED",
-                                            })
-                                        }
-                                    >
-                                        Accept
-                                    </Button>
+                                    {request.friendshipId && (
+                                        <>
+                                            <Button
+                                                size="sm"
+                                                className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-md px-4 h-8 font-medium"
+                                                disabled={mutation.isPending}
+                                                onClick={() =>
+                                                    mutation.mutate({
+                                                        requestId: request.friendshipId!,
+                                                        status: "ACCEPTED",
+                                                    })
+                                                }
+                                            >
+                                                Accept
+                                            </Button>
 
-                                    <Button
-                                        size="sm"
-                                        variant="secondary"
-                                        className="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 rounded-md px-4 h-8 border-transparent font-medium"
-                                        disabled={mutation.isPending}
-                                        onClick={() =>
-                                            mutation.mutate({
-                                                requestId: request.id,
-                                                status: "REJECTED",
-                                            })
-                                        }
-                                    >
-                                        Decline
-                                    </Button>
+                                            <Button
+                                                size="sm"
+                                                variant="secondary"
+                                                className="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 rounded-md px-4 h-8 border-transparent font-medium"
+                                                disabled={mutation.isPending}
+                                                onClick={() =>
+                                                    mutation.mutate({
+                                                        requestId: request.friendshipId!,
+                                                        status: "REJECTED",
+                                                    })
+                                                }
+                                            >
+                                                Decline
+                                            </Button>
+                                        </>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>

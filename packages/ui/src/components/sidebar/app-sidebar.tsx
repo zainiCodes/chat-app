@@ -2,7 +2,8 @@ import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
-
+    SidebarGroup,
+    SidebarGroupContent,
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
@@ -11,7 +12,6 @@ import {
 import { Bell, MessageSquare, Settings, Users2 } from "lucide-react"
 import Header, { type SidebarUser } from "./sidebar-header"
 import { Separator } from "../separator"
-
 import { cn } from "@chat-app/ui/lib/utils"
 import { Logout } from "./logout-dialog"
 const navItems = [
@@ -56,25 +56,34 @@ export function AppSidebar({ renderLink, user, pathname, signOut, onLogoutRedire
         onLogoutRedirect?.()
     }
     return (
-        <Sidebar>
+        <Sidebar collapsible="icon">
             <SidebarHeader >
+                <div className="flex items-center mt-2 group-data-[collapsible=icon]:justify-center">
+                    {/* <SidebarTrigger /> */}
+                </div>
                 <Header user={user} />
             </SidebarHeader>
-            <Separator className="h-[2px] mx-3 mb-4" />
+            <Separator className="h-[2px] mx-3 mb-4 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:w-4" />
             <SidebarContent>
-                <SidebarMenu >
-                    {navItems.map((item) => (
-                        <SidebarMenuItem key={item.id} className={cn("mb-3", item.url === pathname ? "border-l-4 border-primary " : "")}>
-                            <SidebarMenuButton isActive={item.url === pathname} render={renderLink?.(item.url)} tooltip={item.title}>
-                                {item.icon && <item.icon className={item.url === pathname ? "text-[#2629e0]" : ""} />}
-                                <span className={cn("text-lg", item.url === pathname ? "text-[#2629e0]" : "")}>{item.title}</span>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    ))}
-                    <SidebarMenuItem>
-                        <Logout logout={handleLogout} />
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                <SidebarGroup>
+                    <SidebarGroupContent>
+                        <SidebarMenu >
+                            {navItems.map((item) => (
+
+                                <SidebarMenuItem key={item.id} className="my-1">
+                                    <SidebarMenuButton isActive={item.url === pathname} render={renderLink?.(item.url)} tooltip={item.title}>
+                                        {item.icon && <item.icon className={item.url === pathname ? "text-[#2629e0]" : ""} />}
+                                        <span className={cn("text-lg", item.url === pathname ? "text-[#2629e0]" : "")}>{item.title}</span>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+
+                            ))}
+                            <SidebarMenuItem>
+                                <Logout logout={handleLogout} />
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
             </SidebarContent>
             <SidebarFooter />
         </Sidebar>

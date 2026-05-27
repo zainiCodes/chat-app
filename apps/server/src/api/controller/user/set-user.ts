@@ -28,12 +28,21 @@ export async function updateUser(req: Request, res: Response) {
         }
 
         const data = parsedData.data
-        if (data.image) {
-            const result = await cloudinary.uploader.upload(data.image, {
-                folder: "chat-app",
-            });
-            data.image = result.secure_url
+        try {
+            if (data.image && data.image !== "") {
+                const result = await cloudinary.uploader.upload(data.image, {
+                    folder: "chat-app",
+                });
+                data.image = result.secure_url
+            }
+
+        } catch (error) {
+            console.error(error)
+            return res.status(500).json({
+                message: "Failed to upload image.",
+            })
         }
+
         const updatedUser = await prisma.user.update({
             where: {
                 id: userId,
@@ -50,7 +59,7 @@ export async function updateUser(req: Request, res: Response) {
         console.error(error)
 
         return res.status(500).json({
-            message: "Internal server error",
+            message: "Something went wrong",
         })
     }
 }

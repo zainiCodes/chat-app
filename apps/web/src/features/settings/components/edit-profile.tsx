@@ -80,8 +80,8 @@ export default function EditProfileDialog() {
 
             return response.json()
         },
-        onSuccess: () => {
-            toast.success("Updated successfully!")
+        onSuccess: (data) => {
+            toast.success(data.message)
             qc.invalidateQueries({ queryKey: ["user"] })
         },
         onError: (error) => {

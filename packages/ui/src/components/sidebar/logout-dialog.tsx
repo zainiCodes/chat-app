@@ -10,18 +10,22 @@ import {
     DialogTrigger,
 } from "@chat-app/ui/components/dialog"
 import { LogOut, TriangleAlert } from "lucide-react"
+import { SidebarMenuButton, SidebarMenuItem } from "./sidebar"
 
 export function Logout({ logout }: { logout: () => void }) {
     return (
         <Dialog>
             <DialogTrigger className={"w-full"}>
-                <Button
-                    variant="ghost"
-                    className="w-full justify-start text-sm font-medium hover:bg-destructive/10 hover:text-destructive"
-                >
-                    <LogOut className="size-5" />
-                    Logout
-                </Button>
+
+                <SidebarMenuItem className="my-1">
+                    <SidebarMenuButton tooltip={"logout"}>
+                        <LogOut />
+                        <span className="text-lg">Logout</span>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+                {/* <LogOut className="size-5" />
+                    Logout */}
+
             </DialogTrigger>
 
             <DialogContent className="sm:max-w-md rounded-3xl border-0 p-0 overflow-hidden">
@@ -71,6 +75,6 @@ export function Logout({ logout }: { logout: () => void }) {
                     </div>
                 </form>
             </DialogContent>
-        </Dialog>
+        </Dialog >
     )
 }

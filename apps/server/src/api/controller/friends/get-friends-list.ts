@@ -24,15 +24,39 @@ export async function getFriendsList(req: Request, res: Response) {
                 ],
             },
             include: {
-                requester: true,
-                receiver: true,
+                requester: {
+                    select: {
+                        id: true,
+                        name: true,
+                        username: true,
+                        image: true,
+                        isOnline: true
+                    }
+                },
+                receiver: {
+                    select: {
+                        id: true,
+                        name: true,
+                        username: true,
+                        image: true,
+                        isOnline: true
+                    }
+                },
             },
         });
 
+        const friends = friendships.map((f) => {
+            // If the logged in user is the requester, the friend is the receiver (and vice versa)
+            const friend = f.requesterId === userId ? f.receiver : f.requester;
+            return {
+                friendshipId: f.id,
+                ...friend
+            };
+        });
 
         return res.status(200).json({
-            message: "User fetched successfully",
-            friendships
+            message: "Friends fetched successfully",
+            friends
         })
     } catch (error) {
         console.error(error)

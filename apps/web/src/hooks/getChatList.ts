@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 type Response = {
     message: string,
-    AllConversiations: {
+    AllConversations: {
         id: string;
         userId: string;
         conversationId: string;
@@ -70,7 +70,7 @@ function useChatList() {
 
             return data
         },
-        staleTime: 1000 * 60 * 5,
+        // staleTime: 1000 * 60 * 5,
     }
 
     )

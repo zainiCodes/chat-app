@@ -30,7 +30,7 @@ export default function NewChatDialog({ children }: { children: React.ReactNode 
 
     const mutation = useMutation({
         mutationFn: async (id: string) => {
-            const response = await fetch("http://localhost:3000/api/new-conversiation", {
+            const response = await fetch("http://localhost:3000/api/new-conversation", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -43,8 +43,8 @@ export default function NewChatDialog({ children }: { children: React.ReactNode 
             }
         },
         onSuccess: () => {
+            toast.success("Conversation created!")
             qc.invalidateQueries({ queryKey: ["ChatList"] })
-            toast.success("Conversiation created!")
         },
         onError: (error) => {
             console.log(error.message)

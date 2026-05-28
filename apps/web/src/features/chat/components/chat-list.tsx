@@ -1,7 +1,6 @@
 import useChatList from '@/hooks/getChatList'
 import { Button } from '@chat-app/ui/components/button'
 import { MessageCirclePlusIcon } from "lucide-react"
-import React from 'react'
 import { useLoaderData } from "@tanstack/react-router"
 import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from "@chat-app/ui/components/avatar"
 import NewChatDialog from './new-chat-dialog'
@@ -14,7 +13,7 @@ export default function ChatList() {
         return <div className="p-4 text-sm text-muted-foreground text-center">Loading chats...</div>
     }
 
-    if (!data?.AllConversiations || data.AllConversiations.length === 0) {
+    if (!data?.AllConversations || data.AllConversations.length === 0) {
         return (
             <div className='flex flex-col gap-4 items-center justify-center h-full text-center'>
                 <div className="bg-primary/10 p-4 rounded-full">
@@ -38,7 +37,7 @@ export default function ChatList() {
 
     return (
         <div className="flex flex-col gap-2 overflow-y-auto h-full pr-2 mt-4 pb-20">
-            {data.AllConversiations.map((item) => {
+            {data.AllConversations.map((item) => {
                 const isGroup = item.conversation.type === "GROUP";
                 // Get other participants
                 const otherParticipants = item.conversation.participants.filter(p => p.userId !== auth.session.user.id);
@@ -64,7 +63,7 @@ export default function ChatList() {
                 return (
                     <div
                         key={item.id}
-                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors"
+                        className="flex items-center gap-3 py-3 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors"
                     >
                         <Avatar className="h-12 w-12 border shrink-0">
                             <AvatarImage src={displayAvatar || undefined} />

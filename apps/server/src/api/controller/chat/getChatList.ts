@@ -13,7 +13,7 @@ export async function chatList(req: Request, res: Response) {
         }
         const prisma = createPrismaClient()
 
-        const AllConversiations = await prisma.conversationParticipant.findMany({
+        const AllConversations = await prisma.conversationParticipant.findMany({
             where: {
                 userId: session.user.id
             },
@@ -46,7 +46,7 @@ export async function chatList(req: Request, res: Response) {
 
         return res.status(200).json({
             message: "Chat Listed Successfuly",
-            AllConversiations
+            AllConversations
         })
     }
     catch (error) {

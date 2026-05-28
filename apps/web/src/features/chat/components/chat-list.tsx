@@ -4,6 +4,7 @@ import { MessageCirclePlusIcon } from "lucide-react"
 import React from 'react'
 import { useLoaderData } from "@tanstack/react-router"
 import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from "@chat-app/ui/components/avatar"
+import NewChatDialog from './new-chat-dialog'
 
 export default function ChatList() {
     const { data, isPending } = useChatList()
@@ -25,10 +26,12 @@ export default function ChatList() {
                         Start connecting with your friends to see your chats here.
                     </p>
                 </div>
-                <Button className="rounded-lg mt-2">
-                    <MessageCirclePlusIcon className="w-4 h-4 mr-2" />
-                    New Conversation
-                </Button>
+                <NewChatDialog>
+                    <Button className="rounded-lg mt-2">
+                        <MessageCirclePlusIcon className="w-4 h-4 mr-2" />
+                        New Conversation
+                    </Button>
+                </NewChatDialog>
             </div>
         )
     }

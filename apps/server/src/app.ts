@@ -7,7 +7,7 @@ import { userRouter } from "./api/routes/user/get-user";
 import { friendRouter } from "./api/routes/friends/friends-list-route";
 import { friendRequestRouter } from "./api/routes/friends/friend-request-route";
 import { notificationRouter } from "./api/routes/notifications/notification-route";
-import { ChatList } from "./api/routes/chats/chat-list";
+import { Conversiation } from "./api/routes/chats/conversiation";
 
 const app: Express = express();
 app.use(
@@ -32,7 +32,7 @@ app.use("/api", userRouter)
 app.use("/api", friendRouter)
 app.use("/api", friendRequestRouter)
 app.use("/api", notificationRouter)
-app.use("/api", ChatList)
+app.use("/api", Conversiation)
 
 
 

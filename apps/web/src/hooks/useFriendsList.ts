@@ -2,27 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 
 type Response = {
     message: string
-    friendships: {
+    friends: {
+        friendshipId: string;
         id: string;
-        requesterId: string;
-        receiverId: string;
-        status: string;
-        createdAt: string;
-        updatedAt: string;
-        requester: {
-            id: string;
-            name: string;
-            username: string;
-            email: string;
-            image: string;
-        };
-        receiver: {
-            id: string;
-            name: string;
-            username: string;
-            email: string;
-            image: string;
-        };
+        name: string | null;
+        username: string | null;
+        image: string | null;
+        isOnline: boolean;
     }[];
 }
 function useFriendList() {

@@ -18,35 +18,13 @@ import { Send } from "lucide-react"
 import { QueryClient, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-export default function NewChatDialog({ children }: { children: React.ReactNode }) {
+export default function NewChatDialog({ children, setId }: { children: React.ReactNode, setId: (id: string) => void }) {
     const { data, isPending } = useFriendList()
     const qc = new QueryClient()
 
-    const mutation = useMutation({
-        mutationFn: async (id: string) => {
-            const response = await fetch("http://localhost:3000/api/new-conversation", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",
-                body: JSON.stringify({ id }),
-            })
-            if (!response.ok) {
-                throw new Error("Something went wrong")
-            }
-        },
-        onSuccess: () => {
-            toast.success("Conversation created!")
-            qc.invalidateQueries({ queryKey: ["ChatList"] })
-        },
-        onError: (error) => {
-            console.log(error.message)
-        }
-    })
 
     const handleStartChat = (friendId: string) => {
-        mutation.mutate(friendId)
+        setId(friendId)
         console.log("Start conversation with", friendId)
     }
 

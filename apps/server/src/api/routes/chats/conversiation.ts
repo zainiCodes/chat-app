@@ -4,6 +4,4 @@ import { newConversation } from "@/api/controller/chat/new-conversiation"
 export const Conversation: Router = Router()
 
 Conversation.get("/chat-list", chatList)
-Conversation.post("/new-conversation", newConversation)
-
-
+Conversation.post("/new-message", newConversation)

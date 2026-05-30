@@ -4,13 +4,18 @@ import { MessageCirclePlusIcon } from "lucide-react"
 import { useLoaderData } from "@tanstack/react-router"
 import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from "@chat-app/ui/components/avatar"
 import NewChatDialog from './new-chat-dialog'
+import { Spinner } from '@chat-app/ui/components/spinner'
 
 export default function ChatList({ setId }: { setId: (id: string) => void }) {
     const { data, isPending } = useChatList()
     const auth = useLoaderData({ from: "/_app/" })
 
     if (isPending) {
-        return <div className="p-4 text-sm text-muted-foreground text-center">Loading chats...</div>
+        return <div className="p-4 text-sm text-muted-foreground text-center">
+            <div className='w-full h-full flex items-center justify-center'>
+                <Spinner className='size-7' />
+            </div>
+        </div>
     }
 
     if (!data?.AllConversations || data.AllConversations.length === 0) {
@@ -25,7 +30,7 @@ export default function ChatList({ setId }: { setId: (id: string) => void }) {
                         Start connecting with your friends to see your chats here.
                     </p>
                 </div>
-                <NewChatDialog>
+                <NewChatDialog setId={setId}>
                     <Button className="rounded-lg mt-2">
                         <MessageCirclePlusIcon className="w-4 h-4 mr-2" />
                         New Conversation

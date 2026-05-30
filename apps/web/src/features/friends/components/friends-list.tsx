@@ -17,8 +17,17 @@ import {
     ScrollArea
 } from "@chat-app/ui/components/scroll-area"
 import useAllUsers from "@/hooks/useAllUsers"
+import { Spinner } from "@chat-app/ui/components/spinner"
 export default function FriendsList({ viewProfile }: { viewProfile: (id: string) => void }) {
-    const { data } = useAllUsers()
+    const { data, isPending } = useAllUsers()
+
+    if (isPending) {
+        return <div className="p-4 text-sm text-muted-foreground text-center h-full">
+            <div className='w-full h-full flex items-center justify-center'>
+                <Spinner className='size-7' />
+            </div>
+        </div>
+    }
     return (
         <div className="w-full flex flex-col gap-4 mt-6 overflow-hidden">
             <h2 className="text-lg font-semibold text-foreground">Discovery</h2>

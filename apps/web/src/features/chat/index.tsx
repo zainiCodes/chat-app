@@ -5,17 +5,16 @@ import { Input } from "@chat-app/ui/components/input"
 import { Field } from "@chat-app/ui/components/field"
 import { useLoaderData } from "@tanstack/react-router"
 import ChatList from "./components/chat-list"
-import Chat from "./components/chat"
+import Chat from "./components/chat-components/chat"
 import { createContext, useState } from "react"
 
 export const ChatContext = createContext("")
 
 export function ChatComponet() {
-    const auth = useLoaderData({ from: "/_app/" })
     const [id, setId] = useState("")
     return (
         <ChatContext.Provider value={id}>
-            <div className="flex gap-4 h-full overflow-hidden">
+            <div className="flex gap-4 h-full overflow-hidden p-0">
                 <div className="w-2/5 h-full flex flex-col">
                     <div className="mb-4">
                         <Field orientation="horizontal">
@@ -28,7 +27,7 @@ export function ChatComponet() {
                         <ChatList setId={setId} />
                     </div>
                 </div>
-                <div className="w-3/5 h-full overflow-hidden border bg-slate-50">
+                <div className="w-3/5 h-full overflow-hidden border rounded-lg bg-slate-50">
                     <Chat />
                 </div>
             </div>

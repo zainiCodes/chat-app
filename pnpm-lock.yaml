@@ -127,6 +127,9 @@ importers:
       '@chat-app/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@chat-app/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@chat-app/env':
         specifier: workspace:*
         version: link:../../packages/env

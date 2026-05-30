@@ -9,12 +9,6 @@ import {
     DialogHeader
 } from "@chat-app/ui/components/dialog"
 import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from "@chat-app/ui/components/avatar"
-
-import {
-    Card,
-    CardContent,
-    CardHeader
-} from "@chat-app/ui/components/card"
 import {
     ScrollArea
 } from "@chat-app/ui/components/scroll-area"

@@ -5,7 +5,7 @@ import { useLoaderData } from "@tanstack/react-router"
 import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from "@chat-app/ui/components/avatar"
 import NewChatDialog from './new-chat-dialog'
 
-export default function ChatList() {
+export default function ChatList({ setId }: { setId: (id: string) => void }) {
     const { data, isPending } = useChatList()
     const auth = useLoaderData({ from: "/_app/" })
 
@@ -64,6 +64,7 @@ export default function ChatList() {
                     <div
                         key={item.id}
                         className="flex items-center gap-3 py-3 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors"
+                        onClick={() => setId(item.id)}
                     >
                         <Avatar className="h-12 w-12 border shrink-0">
                             <AvatarImage src={displayAvatar || undefined} />

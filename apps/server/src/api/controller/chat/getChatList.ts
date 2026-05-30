@@ -15,7 +15,8 @@ export async function chatList(req: Request, res: Response) {
 
         const AllConversations = await prisma.conversationParticipant.findMany({
             where: {
-                userId: session.user.id
+                userId: session.user.id,
+                leftAt: null,
             },
             include: {
                 conversation: {
@@ -41,7 +42,13 @@ export async function chatList(req: Request, res: Response) {
                         }
                     }
                 }
-            }
+            },
+
+            orderBy: {
+                conversation: {
+                    updatedAt: "desc",
+                },
+            },
         })
 
         return res.status(200).json({

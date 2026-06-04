@@ -6,8 +6,6 @@ export async function newConversation(req: Request, res: Response) {
     try {
         const { id }: { id: string } = req.body;
         const prisma = createPrismaClient();
-        console.log("Friend ID:", id);
-
         const session = await auth.api.getSession({ headers: req.headers });
         if (!session) {
             return res.status(401).json({ message: "Unauthorized" });
@@ -19,7 +17,7 @@ export async function newConversation(req: Request, res: Response) {
             });
         }
 
-        await prisma.conversation.create({
+        const conversation = await prisma.conversation.create({
             data: {
                 type: "DIRECT",
                 participants: {
@@ -34,7 +32,8 @@ export async function newConversation(req: Request, res: Response) {
         })
 
         return res.status(200).json({
-            message: "Conversation created!"
+            message: "Conversation created!",
+            conversationId: conversation.id
         });
 
     } catch (error) {

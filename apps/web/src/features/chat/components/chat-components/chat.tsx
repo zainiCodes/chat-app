@@ -7,8 +7,9 @@ import ChatInput from './chat-input'
 import ChatHeader from './chat-header'
 
 export default function Chat() {
-    const id = useContext(ChatContext)
-    const { data, isPending } = useUserById(id)
+    const SharedData = useContext(ChatContext)
+    const { data, isPending } = useUserById(SharedData.id)
+
     if (!data) {
         return (
             <div className='flex items-center justify-center h-full w-full'>
@@ -19,7 +20,7 @@ export default function Chat() {
     return (
         <div className="flex-1 flex flex-col justify-between h-full">
             <ChatHeader isPending={isPending} data={data.user} />
-            <ChatInput />
+            <ChatInput sharedData={SharedData} />
         </div>
     )
 }

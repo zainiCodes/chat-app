@@ -18,13 +18,23 @@ import { Send } from "lucide-react"
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { ChatListItem } from '@/hooks/getChatList'
 
-export default function NewChatDialog({ children, setId }: { children: React.ReactNode, setId: (id: string) => void }) {
+type CreateConversationResponse = {
+    message: string;
+    conversationId: string;
+};
+
+export default function NewChatDialog({ children, setSharedData }: {
+    children: React.ReactNode, setSharedData: React.Dispatch<React.SetStateAction<{
+        id: string;
+        conversationId: string;
+    }>>
+}) {
     const { data, isPending } = useFriendList()
     const qc = useQueryClient()
 
     const mutation = useMutation({
-        mutationFn: async (id) => {
-            await fetch("http://localhost:3000/api/new-conversation", {
+        mutationFn: async (id): Promise<CreateConversationResponse> => {
+            const res = await fetch("http://localhost:3000/api/new-conversation", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -32,6 +42,10 @@ export default function NewChatDialog({ children, setId }: { children: React.Rea
                 credentials: "include",
                 body: JSON.stringify({ id }),
             })
+            if (!res.ok) {
+                throw new Error("Failed to create conversation");
+            }
+            return res.json()
         },
         onMutate: async (id: string) => {
             await qc.cancelQueries({ queryKey: ["ChatList"] })
@@ -86,7 +100,7 @@ export default function NewChatDialog({ children, setId }: { children: React.Rea
         onError: (err, newTodo, context) => {
             qc.setQueryData(["ChatList"], context?.prevCon)
         },
-        onSettled: () => {
+        onSettled: (data) => {
             qc.invalidateQueries({ queryKey: ["ChatList"] })
         }
 
@@ -96,7 +110,10 @@ export default function NewChatDialog({ children, setId }: { children: React.Rea
 
 
     const handleStartChat = (friendId: string) => {
-        setId(friendId)
+        setSharedData({
+            id: friendId,
+            conversationId: ""
+        })
         mutation.mutate(friendId)
         console.log("Start conversation with", friendId)
     }

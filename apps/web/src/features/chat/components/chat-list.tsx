@@ -6,10 +6,14 @@ import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from "@chat-app/ui/c
 import NewChatDialog from './new-chat-dialog'
 import { Spinner } from '@chat-app/ui/components/spinner'
 
-export default function ChatList({ setId }: { setId: (id: string) => void }) {
+export default function ChatList({ setSharedData }: {
+    setSharedData: React.Dispatch<React.SetStateAction<{
+        id: string;
+        conversationId: string;
+    }>>
+}) {
     const { data, isPending } = useChatList()
     const auth = useLoaderData({ from: "/_app/" })
-
     if (isPending) {
         return <div className="p-4 text-sm text-muted-foreground text-center">
             <div className='w-full h-full flex items-center justify-center'>
@@ -30,7 +34,7 @@ export default function ChatList({ setId }: { setId: (id: string) => void }) {
                         Start connecting with your friends to see your chats here.
                     </p>
                 </div>
-                <NewChatDialog setId={setId}>
+                <NewChatDialog setSharedData={setSharedData}>
                     <Button className="rounded-lg mt-2">
                         <MessageCirclePlusIcon className="w-4 h-4 mr-2" />
                         New Conversation
@@ -69,7 +73,7 @@ export default function ChatList({ setId }: { setId: (id: string) => void }) {
                     <div
                         key={item.id}
                         className="flex items-center gap-3 py-3 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors"
-                        onClick={() => setId(mainParticipant?.userId)}
+                        onClick={() => setSharedData({ id: mainParticipant?.userId, conversationId: item.conversationId })}
                     >
                         <Avatar className="h-12 w-12 border shrink-0">
                             <AvatarImage src={displayAvatar || undefined} />

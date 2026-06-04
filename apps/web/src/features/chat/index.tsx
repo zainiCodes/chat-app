@@ -8,12 +8,20 @@ import ChatList from "./components/chat-list"
 import Chat from "./components/chat-components/chat"
 import { createContext, useState } from "react"
 
-export const ChatContext = createContext("")
+export const ChatContext = createContext({
+    id: "",
+    conversationId: ""
+})
 
 export function ChatComponet() {
-    const [id, setId] = useState("")
+    const [sharedData, setSharedData] = useState({
+        id: "",
+        conversationId: "",
+    })
+
+
     return (
-        <ChatContext.Provider value={id}>
+        <ChatContext.Provider value={sharedData}>
             <div className="flex gap-4 h-full overflow-hidden p-0">
                 <div className="w-2/5 h-full flex flex-col">
                     <div className="mb-4">
@@ -24,7 +32,7 @@ export function ChatComponet() {
                     </div>
                     <div className="flex-1 overflow-hidden">
                         <h2 className="text-lg font-semibold text-foreground">Chat</h2>
-                        <ChatList setId={setId} />
+                        <ChatList setSharedData={setSharedData} />
                     </div>
                 </div>
                 <div className="w-3/5 h-full overflow-hidden border rounded-lg bg-slate-50">

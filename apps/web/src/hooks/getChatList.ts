@@ -1,28 +1,44 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Prisma } from "@chat-app/db";
 
-type ChatListItem = Prisma.ConversationParticipantGetPayload<{
-    include: {
-        conversation: {
-            include: {
-                messages: true; // Note: You don't need 'take: 1' or 'orderBy' here, just 'true' works for types
-                participants: {
-                    include: {
-                        user: {
-                            select: {
-                                id: true;
-                                username: true;
-                                name: true;
-                                image: true;
-                                isOnline: true;
-                            };
-                        };
-                    };
-                };
-            };
-        };
-    };
-}>;
+export type ChatListItem = {
+    id: string,
+    userId: string,
+    conversationId: string,
+    role: "MEMBER" | "Admin",
+    joinedAt: Date,
+    conversation: {
+        id: string,
+        name: string | null,
+        avatarUrl: string | null,
+        type: "DIRECT" | "GROUP",
+        createdAt: Date,
+        updatedAt: Date,
+        messages: {
+            id: string,
+            content: string | null,
+            createdAt: Date,
+            type: "TEXT"
+        }[],
+        participants: {
+            id: string;
+            conversationId: string;
+            userId: string;
+            role: "ADMIN" | "MEMBER";
+            joinedAt: Date;
+            leftAt: Date | null;
+            mutedUntil: Date | null;
+            lastReadSeq: bigint | null;
+            user: {
+                id: string;
+                name: string;
+                image: string | null;
+                username: string;
+                isOnline: boolean;
+            }
+        }[]
+    }
+}
 
 type Response = {
     message: string;

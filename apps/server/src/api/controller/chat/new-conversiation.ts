@@ -19,9 +19,19 @@ export async function newConversation(req: Request, res: Response) {
             });
         }
 
-
-
-
+        await prisma.conversation.create({
+            data: {
+                type: "DIRECT",
+                participants: {
+                    createMany: {
+                        data: [
+                            { userId: session.user.id, role: "ADMIN" },
+                            { userId: id, role: "MEMBER" }
+                        ]
+                    }
+                }
+            }
+        })
 
         return res.status(200).json({
             message: "Conversation created!"

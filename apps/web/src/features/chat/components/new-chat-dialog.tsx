@@ -16,15 +16,88 @@ import { Input } from '@chat-app/ui/components/input'
 import { Button } from '@chat-app/ui/components/button'
 import { Send } from "lucide-react"
 import { QueryClient, useMutation } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import { ChatListItem } from '@/hooks/getChatList'
 
 export default function NewChatDialog({ children, setId }: { children: React.ReactNode, setId: (id: string) => void }) {
     const { data, isPending } = useFriendList()
     const qc = new QueryClient()
 
+    const mutation = useMutation({
+        mutationFn: async (id) => {
+            await fetch("http://localhost:3000/api/new-conversation", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({ id }),
+            })
+        },
+        onMutate: async (id: string) => {
+            await qc.cancelQueries({ queryKey: ["ChatList"] })
+            const prevCon = qc.getQueryData(["ChatList"])
+            qc.setQueryData(["ChatList"], (prev: any) => {
+                if (!prev) return prev;
+                const friend = data?.friends.find((f) => f.id === id);
+                if (!friend) return prev;
+
+                const newConversation: ChatListItem = {
+                    id: "temp-" + Date.now(),
+                    userId: "temp",
+                    conversationId: "temp-conv-" + Date.now(),
+                    role: "MEMBER",
+                    joinedAt: new Date(),
+                    conversation: {
+                        id: "temp-conv-" + Date.now(),
+                        avatarUrl: null,
+                        name: null,
+                        type: "DIRECT",
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                        messages: [],
+                        participants: [
+                            {
+                                id: "temp-part",
+                                role: "MEMBER",
+                                lastReadSeq: null,
+                                leftAt: null,
+                                mutedUntil: null,
+                                userId: friend.id,
+                                conversationId: "temp-conv-" + Date.now(),
+                                joinedAt: new Date(),
+                                user: {
+                                    id: friend.id,
+                                    name: friend.name || "",
+                                    username: friend.username || "",
+                                    image: friend.image || null,
+                                    isOnline: friend.isOnline || false,
+                                }
+                            }
+                        ]
+                    }
+                }
+                return {
+                    ...prev,
+                    AllConversations: [newConversation, ...(prev.AllConversations || [])]
+                }
+            })
+            return { prevCon }
+        },
+        onError: (err, newTodo, context) => {
+            qc.setQueryData(["ChatList"], context?.prevCon)
+        },
+        onSettled: () => {
+            qc.invalidateQueries({ queryKey: ["ChatList"] })
+        }
+
+
+
+    })
+
 
     const handleStartChat = (friendId: string) => {
         setId(friendId)
+        mutation.mutate(friendId)
         console.log("Start conversation with", friendId)
     }
 

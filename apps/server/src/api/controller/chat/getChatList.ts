@@ -17,6 +17,21 @@ export async function chatList(req: Request, res: Response) {
             where: {
                 userId: session.user.id,
                 leftAt: null,
+                OR: [
+                    { conversation: { type: "GROUP" } },
+                    {
+                        conversation: {
+                            type: "DIRECT",
+                            messages: {
+                                some: {}
+                            }
+                        }
+                    },
+                    {
+                        conversation: { type: "DIRECT" },
+                        role: "ADMIN"
+                    }
+                ]
             },
             include: {
                 conversation: {

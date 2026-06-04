@@ -1,15 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
+import { User } from "./useUser"
 type Response = {
     message: string
-    user: {
-        id: string,
-        name: string,
-        email: string,
-        username: string,
-        image: string,
-        bio: string,
-        createdAt: Date,
-    }
+    user: User
     friendships: {
         id: string;
         requesterId: string;

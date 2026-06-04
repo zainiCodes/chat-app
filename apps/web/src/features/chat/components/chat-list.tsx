@@ -69,7 +69,7 @@ export default function ChatList({ setId }: { setId: (id: string) => void }) {
                     <div
                         key={item.id}
                         className="flex items-center gap-3 py-3 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors"
-                        onClick={() => setId(item.id)}
+                        onClick={() => setId(mainParticipant?.userId)}
                     >
                         <Avatar className="h-12 w-12 border shrink-0">
                             <AvatarImage src={displayAvatar || undefined} />

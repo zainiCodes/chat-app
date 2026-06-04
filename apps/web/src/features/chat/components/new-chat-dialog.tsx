@@ -15,12 +15,12 @@ import {
 import { Input } from '@chat-app/ui/components/input'
 import { Button } from '@chat-app/ui/components/button'
 import { Send } from "lucide-react"
-import { QueryClient, useMutation } from '@tanstack/react-query'
+import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { ChatListItem } from '@/hooks/getChatList'
 
 export default function NewChatDialog({ children, setId }: { children: React.ReactNode, setId: (id: string) => void }) {
     const { data, isPending } = useFriendList()
-    const qc = new QueryClient()
+    const qc = useQueryClient()
 
     const mutation = useMutation({
         mutationFn: async (id) => {

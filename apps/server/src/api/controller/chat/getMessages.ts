@@ -52,10 +52,20 @@ export async function getMessage(req: Request, res: Response) {
                 },
             },
         })
+        const serialized = JSON.parse(
+            JSON.stringify(
+                allMessages,
+                (_, value) =>
+                    typeof value === "bigint"
+                        ? Number(value)
+                        : value
+            )
+        )
+
 
         return res.status(200).json({
             message: "Messages fetched success!",
-            allMessages
+            allMessages: serialized
         })
 
 

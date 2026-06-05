@@ -66,9 +66,19 @@ export async function chatList(req: Request, res: Response) {
             },
         })
 
+        const serialized = JSON.parse(
+            JSON.stringify(
+                AllConversations,
+                (_, value) =>
+                    typeof value === "bigint"
+                        ? Number(value)
+                        : value
+            )
+        )
+
         return res.status(200).json({
             message: "Chat Listed Successfuly",
-            AllConversations
+            AllConversations: serialized
         })
     }
     catch (error) {

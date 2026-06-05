@@ -5,7 +5,7 @@ export type ChatListItem = {
     id: string,
     userId: string,
     conversationId: string,
-    role: "MEMBER" | "Admin",
+    role: "MEMBER" | "ADMIN",
     joinedAt: Date,
     conversation: {
         id: string,

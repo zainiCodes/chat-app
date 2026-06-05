@@ -7,7 +7,7 @@ export type Message = {
     conversationId: string;
     createdAt: Date;
     updatedAt: Date;
-    seq: bigint;
+    seq: number;
     senderId: string;
     content: string | null;
     mediaUrl: string | null;
@@ -46,9 +46,8 @@ function useGetMessagebyId(conversationId: string) {
 
             return data
         },
-        // staleTime: 1000 * 60 * 5,
+        staleTime: 1000 * 60 * 5,
     }
-
     )
     return { data, isPending, error }
 }

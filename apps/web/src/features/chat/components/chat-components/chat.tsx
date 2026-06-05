@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@chat-app/ui/components/ava
 import { Input } from '@chat-app/ui/components/input'
 import ChatInput from './chat-input'
 import ChatHeader from './chat-header'
+import ChatBody from './chat-body'
 
 export default function Chat() {
     const SharedData = useContext(ChatContext)
@@ -18,8 +19,11 @@ export default function Chat() {
         )
     }
     return (
-        <div className="flex-1 flex flex-col justify-between h-full">
-            <ChatHeader isPending={isPending} data={data.user} />
+        <div className=" flex flex-col h-full">
+            <div className='flex-1'>
+                <ChatHeader isPending={isPending} data={data.user} />
+            </div>
+            <ChatBody conversationId={SharedData.conversationId} />
             <ChatInput sharedData={SharedData} />
         </div>
     )

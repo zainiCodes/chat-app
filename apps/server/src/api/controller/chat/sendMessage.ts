@@ -4,7 +4,6 @@ import { auth } from "@chat-app/auth";
 
 export async function sendMessage(req: Request, res: Response) {
     try {
-        console.log("Enter")
         const { conversationId, senderId, content }: { conversationId: string, content: string, senderId: string } = req.body;
         const prisma = createPrismaClient();
         const session = await auth.api.getSession({ headers: req.headers });
@@ -14,7 +13,6 @@ export async function sendMessage(req: Request, res: Response) {
         if (!conversationId || !content || !senderId) {
             return res.status(400).json({ message: "Data is missing" })
         }
-        console.log(conversationId)
 
         const message = await prisma.message.create({
             data: {
@@ -25,30 +23,27 @@ export async function sendMessage(req: Request, res: Response) {
             }
         })
 
-        const allConversations =
-            await prisma.conversationParticipant.findMany({
-                where: {
-                    userId: session.user.id,
-                    leftAt: null,
-                    OR: [
-                        { conversation: { type: "GROUP" } },
-                        {
-                            conversation: {
-                                type: "DIRECT",
-                                messages: {
-                                    some: {}
-                                }
+        await prisma.conversationParticipant.findMany({
+            where: {
+                userId: session.user.id,
+                leftAt: null,
+                OR: [
+                    { conversation: { type: "GROUP" } },
+                    {
+                        conversation: {
+                            type: "DIRECT",
+                            messages: {
+                                some: {}
                             }
-                        },
-                        {
-                            conversation: { type: "DIRECT" },
-                            role: "ADMIN"
                         }
-                    ]
-                }
-            })
-
-        console.log(allConversations.length)
+                    },
+                    {
+                        conversation: { type: "DIRECT" },
+                        role: "ADMIN"
+                    }
+                ]
+            }
+        })
 
 
         const participants = await prisma.conversationParticipant.findMany({

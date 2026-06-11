@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import { useEffect } from "react"
 
 import { Button } from "@chat-app/ui/components/button"
 import { Label } from "@chat-app/ui/components/label"
@@ -22,9 +22,9 @@ import { toast } from "sonner"
 const profileSchema = z.object({
     name: z.string().min(2, "Name is too short"),
     username: z.string().min(3, "Username is too short"),
-    email: z.string().email("Invalid email"),
+    email: z.email("invalid Email"),
     bio: z.string(),
-    image: z.string().optional(),
+    image: z.file().optional(),
 })
 
 type ProfileForm = z.infer<typeof profileSchema>
@@ -41,11 +41,21 @@ export default function EditProfileDialog() {
             username: "",
             email: "",
             bio: "",
-            image: "",
         } as ProfileForm,
 
         onSubmit: async ({ value }) => {
-            mutate(value)
+            const formData = new FormData()
+            formData.append("name", value.name)
+            formData.append("username", value.username)
+            formData.append("bio", value.bio)
+            formData.append("email", value.email)
+            if (value.image) {
+                formData.append("image", value.image)
+            }
+            for (const pair of formData.entries()) {
+                console.log(pair[0], pair[1])
+            }
+            mutate(formData)
         },
 
         validators: {
@@ -59,18 +69,14 @@ export default function EditProfileDialog() {
             form.setFieldValue("username", user.username)
             form.setFieldValue("email", user.email)
             form.setFieldValue("bio", user.bio || "")
-            form.setFieldValue("image", user.image || "")
         }
     }, [user])
     const { mutate, isPending } = useMutation({
-        mutationFn: async (data: ProfileForm) => {
+        mutationFn: async (formData: FormData) => {
             const response = await fetch("http://localhost:3000/api/setUser", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
                 credentials: "include",
-                body: JSON.stringify(data),
+                body: formData,
             })
 
             if (!response.ok) {
@@ -89,19 +95,7 @@ export default function EditProfileDialog() {
         }
     })
 
-    const toBase64 = (file: File): Promise<string> => { // this is only for converting image to string
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader()
 
-            reader.readAsDataURL(file)
-
-            reader.onload = () => {
-                resolve(reader.result as string)
-            }
-
-            reader.onerror = (error) => reject(error)
-        })
-    }
     return (
         <Dialog>
 
@@ -232,12 +226,21 @@ export default function EditProfileDialog() {
                                     onChange={async (e) => {
                                         const file = e.target.files?.[0]
                                         if (!file) return
+                                        const maxSize = 5 * 1024 * 1024
 
-                                        const base64 = await toBase64(file)
-
-                                        field.handleChange(base64)
+                                        if (file.size > maxSize) {
+                                            toast.error("Image must be smaller than 5MB")
+                                            e.currentTarget.value = ""
+                                            return
+                                        }
+                                        field.handleChange(file)
                                     }}
                                 />
+                                {field.state.meta.errors.map((error) => (
+                                    <p key={error?.message} className="text-red-500">
+                                        {error?.message}
+                                    </p>
+                                ))}
                             </div>
                         )}
                     </form.Field>

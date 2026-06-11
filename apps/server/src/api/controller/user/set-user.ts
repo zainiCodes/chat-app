@@ -2,7 +2,7 @@ import { type Request, type Response } from "express"
 import prisma from "@chat-app/db"
 import { auth } from "@chat-app/auth"
 import { userSchema } from "@/api/validators/user-schema"
-import cloudinary from "@/lib/cloudinary"
+import { uploadToCloudinary } from "@/api/services/uploadToCloudinaryFn"
 
 export async function updateUser(req: Request, res: Response) {
     try {
@@ -17,6 +17,9 @@ export async function updateUser(req: Request, res: Response) {
         }
 
         const userId = session.user.id
+        console.log(req.body)
+        console.log(req.file)
+
         // ✅ Validate body with Zod
         const parsedData = userSchema.safeParse(req.body)
 
@@ -28,12 +31,14 @@ export async function updateUser(req: Request, res: Response) {
         }
 
         const data = parsedData.data
+        let imageUrl: string | undefined
         try {
-            if (data.image && data.image !== "") {
-                const result = await cloudinary.uploader.upload(data.image, {
-                    folder: "chat-app",
-                });
-                data.image = result.secure_url
+            if (req.file) {
+                const uploadedImage = await uploadToCloudinary(
+                    req.file.buffer
+                )
+
+                imageUrl = uploadedImage.secure_url
             }
 
         } catch (error) {
@@ -47,7 +52,10 @@ export async function updateUser(req: Request, res: Response) {
             where: {
                 id: userId,
             },
-            data,
+            data: {
+                ...data,
+                image: imageUrl,
+            },
         })
 
 

@@ -5,5 +5,4 @@ export const userSchema = z.object({
     username: z.string().min(3, "Username is too short").optional(),
     email: z.string().email("Invalid email").optional(),
     bio: z.string(),
-    image: z.string().optional(),
 })

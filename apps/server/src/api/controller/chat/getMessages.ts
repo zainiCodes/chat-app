@@ -39,7 +39,7 @@ export async function getMessage(req: Request, res: Response) {
                 isDeleted: false,
             },
             orderBy: {
-                seq: "desc",
+                seq: "asc",
             },
             take: 50,
             include: {

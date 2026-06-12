@@ -70,9 +70,10 @@ export default function ChatList({ setSharedData }: {
                 const lastMessage = item.conversation.messages[0];
 
                 return (
-                    <div
+                    <button
                         key={item.id}
-                        className="flex items-center gap-3 py-3 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors"
+                        type="button"
+                        className="flex items-center gap-3 py-3 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors w-full text-left"
                         onClick={() => setSharedData({ id: mainParticipant?.userId, conversationId: item.conversationId })}
                     >
                         <Avatar className="h-12 w-12 border shrink-0">
@@ -98,7 +99,7 @@ export default function ChatList({ setSharedData }: {
                                 )}
                             </p>
                         </div>
-                    </div>
+                    </button>
                 )
             })}
         </div>

@@ -52,9 +52,6 @@ export default function EditProfileDialog() {
             if (value.image) {
                 formData.append("image", value.image)
             }
-            for (const pair of formData.entries()) {
-                console.log(pair[0], pair[1])
-            }
             mutate(formData)
         },
 
@@ -70,7 +67,7 @@ export default function EditProfileDialog() {
             form.setFieldValue("email", user.email)
             form.setFieldValue("bio", user.bio || "")
         }
-    }, [user])
+    }, [user, form])
     const { mutate, isPending } = useMutation({
         mutationFn: async (formData: FormData) => {
             const response = await fetch("http://localhost:3000/api/setUser", {

@@ -8,7 +8,7 @@ export default function SignUpPage() {
             <div className='w-1/2 flex items-center justify-center'>
                 <SignUpForm />
             </div>
-            <img className='w-1/2 h-screen' src={myImage} alt="login page image" />
+            <img className='w-1/2 h-screen' src={myImage} alt="login page" />
         </div>
     )
 }

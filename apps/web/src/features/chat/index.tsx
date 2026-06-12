@@ -1,16 +1,10 @@
-// side bar things are in @chat-app/ui/component/sidebar
-import { Route } from "@/routes/_app/index"
 import { Button } from "@chat-app/ui/components/button"
 import { Input } from "@chat-app/ui/components/input"
 import { Field } from "@chat-app/ui/components/field"
 import ChatList from "./components/chat-list"
 import Chat from "./components/chat-components/chat"
-import { createContext, useState } from "react"
-
-export const ChatContext = createContext({
-    id: "",
-    conversationId: ""
-})
+import { useState } from "react"
+import { ChatContext } from "./chat-context"
 
 export function ChatComponet() {
     const [sharedData, setSharedData] = useState({

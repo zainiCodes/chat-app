@@ -1,6 +1,7 @@
-import { useContext } from "react"
-import { UserIdContext } from "../index"
+import { use, useMemo } from "react"
+import { UserIdContext } from "../userIdContext"
 import useUserById from "@/hooks/useUserById"
+
 import {
     Avatar,
     AvatarFallback,
@@ -17,8 +18,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
 export default function FriendsProfile() {
-    const userId = useContext(UserIdContext)
+    const userId = use(UserIdContext)
     const { data, isPending } = useUserById(userId)
+    const dateFormatter = useMemo(() => {
+        return new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' });
+    }, [])
     const queryClient = useQueryClient()
     const mutation = useMutation({
         mutationFn: async () => {
@@ -57,11 +61,11 @@ export default function FriendsProfile() {
 
     if (!data) return null;
 
-    const { user } = data;
-    const friendshipStatus = data.friendships?.status;
+    const { user, friendships } = data;
+    const friendshipStatus = friendships?.status;
 
     const memberSince = user.createdAt
-        ? new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' }).format(new Date(user.createdAt))
+        ? dateFormatter.format(new Date(user.createdAt))
         : 'Unknown';
 
     return (
@@ -149,11 +153,11 @@ export default function FriendsProfile() {
 
                 {/* Bottom Actions */}
                 <div className="flex w-full px-16 justify-between mt-10">
-                    <button className="flex items-center gap-2 text-gray-500 hover:text-gray-800 transition-colors text-xs font-semibold">
+                    <button type="button" className="flex items-center gap-2 text-gray-500 hover:text-gray-800 transition-colors text-xs font-semibold">
                         <Ban className="w-4 h-4 text-[#d9945e]" />
                         Block User
                     </button>
-                    <button className="flex items-center gap-2 text-gray-500 hover:text-gray-800 transition-colors text-xs font-semibold">
+                    <button type="button" className="flex items-center gap-2 text-gray-500 hover:text-gray-800 transition-colors text-xs font-semibold">
                         <Flag className="w-4 h-4 text-[#d9945e]" />
                         Report Profile
                     </button>

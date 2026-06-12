@@ -74,6 +74,7 @@ export default function ChatInput({ sharedData }: { sharedData: { id: string, co
         onSubmit: ({ value }) => {
             if (value.input == "") {
                 return null
+
             }
             sendMessage.mutate({
                 conversationId: sharedData.conversationId,
@@ -84,7 +85,7 @@ export default function ChatInput({ sharedData }: { sharedData: { id: string, co
         },
         validators: {
             onSubmit: z.object({
-                input: z.string(""),
+                input: z.string({ error: "" }),
             })
         },
     })

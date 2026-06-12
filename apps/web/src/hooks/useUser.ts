@@ -9,6 +9,7 @@ export type User = {
     bio?: string | null
     isOnline: boolean
     lastSeenAt?: string | null
+    createdAt: Date,
 }
 
 export type GetUserResponse = {

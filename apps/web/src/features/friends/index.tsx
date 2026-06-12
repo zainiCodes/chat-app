@@ -3,9 +3,8 @@ import { Field } from "@chat-app/ui/components/field";
 import FriendsProfile from "./components/friend-profile";
 import FriendsList from "./components/friends-list";
 import { Button } from "@chat-app/ui/components/button";
-import { createContext, useState } from "react";
-
-export const UserIdContext = createContext("")
+import { useState } from "react";
+import { UserIdContext } from "./userIdContext";
 
 export default function FriendsComponent() {
     const [userId, setUserId] = useState("")

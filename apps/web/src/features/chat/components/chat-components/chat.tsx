@@ -1,4 +1,4 @@
-import { use } from 'react'
+import { use, useEffect } from 'react'
 import { ChatContext } from '@/features/chat/chat-context'
 import useUserById from '@/hooks/useUserById'
 import ChatInput from './chat-input'

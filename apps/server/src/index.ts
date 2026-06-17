@@ -28,9 +28,13 @@
 
 
 import app from "./app";
-
+import { createServer } from "http";
+import { intializeServer } from "./lib/socket";
 const PORT = 3000;
 
-app.listen(PORT, () => {
+const httpServer = createServer(app);
+intializeServer(httpServer)
+
+httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

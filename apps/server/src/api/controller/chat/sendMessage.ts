@@ -1,6 +1,7 @@
 import { type Request, type Response } from "express";
 import { createPrismaClient } from "@chat-app/db";
 import { auth } from "@chat-app/auth";
+import { io } from "@/lib/socket";
 
 export async function sendMessage(req: Request, res: Response) {
     try {
@@ -22,6 +23,20 @@ export async function sendMessage(req: Request, res: Response) {
                 senderId: senderId,
             }
         })
+        const messageData = JSON.parse(
+            JSON.stringify(
+                message,
+                (_, value) =>
+                    typeof value === "bigint"
+                        ? Number(value)
+                        : value
+            )
+        )
+
+        io.to(conversationId).emit(
+            "new-message",
+            messageData
+        )
 
         await prisma.conversationParticipant.findMany({
             where: {

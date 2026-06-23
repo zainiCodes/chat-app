@@ -1,5 +1,5 @@
 import { Separator } from "@chat-app/ui/components/separator"
-import { SidebarTrigger } from "@chat-app/ui/components/sidebar/sidebar"
+import { SidebarTrigger } from "@/helper-component/sidebar/sidebar"
 import { useLocation } from "@tanstack/react-router"
 
 export function SiteHeader() {

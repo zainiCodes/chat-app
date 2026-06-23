@@ -1,3 +1,4 @@
+import { env } from "@chat-app/env/server";
 import { Server } from "socket.io";
 
 export let io: Server;
@@ -5,7 +6,7 @@ export let io: Server;
 export const intializeServer = (server: any) => {
     io = new Server(server, {
         cors: {
-            origin: "http://localhost:3001",
+            origin: env.CORS_ORIGIN,
             credentials: true,
         },
     })

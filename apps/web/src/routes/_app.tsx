@@ -1,11 +1,9 @@
 import { Outlet, useNavigate } from "@tanstack/react-router";
 
-import { AppSidebar } from "@chat-app/ui/components/sidebar/app-sidebar";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@chat-app/ui/components/sidebar/sidebar"
-import { Link, useLocation } from "@tanstack/react-router";
-import { authClient } from "@/lib/auth-client";
+import { AppSidebar } from "@/helper-component/sidebar/app-sidebar";
+import { SidebarInset, SidebarProvider, } from "@/helper-component/sidebar/sidebar"
+import { Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/helper-component/sidebarHeader/sideHeader";
-import useUser from "@/hooks/useUser";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute('/_app')({
@@ -13,7 +11,7 @@ export const Route = createFileRoute('/_app')({
     head: () => ({
         meta: [
             {
-                title: "zaini",
+                title: "Chat-App",
             },
             {
                 name: "description",
@@ -30,21 +28,11 @@ export const Route = createFileRoute('/_app')({
 });
 
 function AppLayout() {
-    const auth = authClient.useSession()
-    const { data: userData } = useUser()
-    const user = userData?.user || auth.data?.user
-    const location = useLocation()
-    const navigate = useNavigate()
+
     return (
         <SidebarProvider>
             <div className="flex h-svh w-full">
-                <AppSidebar renderLink={(url) => <Link to={url} />}
-                    user={user} pathname={location.pathname} signOut={() => { authClient.signOut() }}
-                    onLogoutRedirect={() => {
-                        navigate({
-                            to: "/login",
-                        })
-                    }} />
+                <AppSidebar renderLink={(url) => <Link to={url} />} />
                 <SidebarInset>
                     <SiteHeader />
                     <div className="flex-1 overflow-y-auto p-4 md:p-6">

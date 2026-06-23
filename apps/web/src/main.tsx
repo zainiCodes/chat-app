@@ -5,6 +5,7 @@ import { routeTree } from "./routeTree.gen";
 import { authClient } from "./lib/auth-client";
 import NotFoundPage from "./not-found";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SidebarProvider } from "./helper-component/sidebar/sidebar";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <QueryClientProvider client={queryClient}>
+
       <RouterProvider router={router} />
     </QueryClientProvider>
   );

@@ -120,7 +120,7 @@ export default function NewChatDialog({ children, setSharedData }: {
 
     return (
         <Dialog>
-            <DialogTrigger>
+            <DialogTrigger className={"w-full"}>
                 {children}
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">

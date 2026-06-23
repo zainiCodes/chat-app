@@ -1,6 +1,13 @@
-import { createContext } from "react"
+import { createContext, Dispatch, SetStateAction } from "react"
 
-export const ChatContext = createContext<{
-    id: string,
-    conversationId: string
-} | undefined>(undefined)
+export type ChatContextType = {
+    id: string;
+    conversationId: string;
+    setSharedData: Dispatch<SetStateAction<{ id: string; conversationId: string }>>;
+}
+
+export const ChatContext = createContext<ChatContextType>({
+    id: "",
+    conversationId: "",
+    setSharedData: () => {}
+})

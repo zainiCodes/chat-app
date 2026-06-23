@@ -33,7 +33,7 @@ export default function NewChatDialog({ children, setSharedData }: {
     const qc = useQueryClient()
 
     const mutation = useMutation({
-        mutationFn: async (id): Promise<CreateConversationResponse> => {
+        mutationFn: async (id: string): Promise<CreateConversationResponse> => {
             const res = await fetch("http://localhost:3000/api/new-conversation", {
                 method: "POST",
                 headers: {
@@ -47,62 +47,72 @@ export default function NewChatDialog({ children, setSharedData }: {
             }
             return res.json()
         },
-        onMutate: async (id: string) => {
-            await qc.cancelQueries({ queryKey: ["ChatList"] })
-            const prevCon = qc.getQueryData(["ChatList"])
-            qc.setQueryData(["ChatList"], (prev: any) => {
-                if (!prev) return prev;
-                const friend = data?.friends.find((f) => f.id === id);
-                if (!friend) return prev;
+        // onMutate: async (id: string) => {
+        //     await qc.cancelQueries({ queryKey: ["ChatList"] })
+        //     const prevCon = qc.getQueryData(["ChatList"])
+        //     qc.setQueryData(["ChatList"], (prev: any) => {
+        //         if (!prev) return prev;
+        //         const friend = data?.friends.find((f) => f.id === id);
+        //         if (!friend) return prev;
 
-                const newConversation: ChatListItem = {
-                    id: "temp-" + Date.now(),
-                    userId: "temp",
-                    conversationId: "temp-conv-" + Date.now(),
-                    role: "MEMBER",
-                    joinedAt: new Date(),
-                    conversation: {
-                        id: "temp-conv-" + Date.now(),
-                        avatarUrl: null,
-                        name: null,
-                        type: "DIRECT",
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                        messages: [],
-                        participants: [
-                            {
-                                id: "temp-part",
-                                role: "MEMBER",
-                                lastReadSeq: null,
-                                leftAt: null,
-                                mutedUntil: null,
-                                userId: friend.id,
-                                conversationId: "temp-conv-" + Date.now(),
-                                joinedAt: new Date(),
-                                user: {
-                                    id: friend.id,
-                                    name: friend.name || "",
-                                    username: friend.username || "",
-                                    image: friend.image || null,
-                                    isOnline: friend.isOnline || false,
-                                }
-                            }
-                        ]
-                    }
-                }
-                return {
-                    ...prev,
-                    AllConversations: [newConversation, ...(prev.AllConversations || [])]
-                }
+        //         const newConversation: ChatListItem = {
+        //             id: "temp-" + Date.now(),
+        //             userId: "temp",
+        //             conversationId: "temp-conv-" + Date.now(),
+        //             role: "MEMBER",
+        //             joinedAt: new Date(),
+        //             conversation: {
+        //                 id: "temp-conv-" + Date.now(),
+        //                 avatarUrl: null,
+        //                 name: null,
+        //                 type: "DIRECT",
+        //                 createdAt: new Date(),
+        //                 updatedAt: new Date(),
+        //                 messages: [],
+        //                 participants: [
+        //                     {
+        //                         id: "temp-part",
+        //                         role: "MEMBER",
+        //                         lastReadSeq: null,
+        //                         leftAt: null,
+        //                         mutedUntil: null,
+        //                         userId: friend.id,
+        //                         conversationId: "temp-conv-" + Date.now(),
+        //                         joinedAt: new Date(),
+        //                         user: {
+        //                             id: friend.id,
+        //                             name: friend.name || "",
+        //                             username: friend.username || "",
+        //                             image: friend.image || null,
+        //                             isOnline: friend.isOnline || false,
+        //                         }
+        //                     }
+        //                 ]
+        //             }
+        //         }
+        //         return {
+        //             ...prev,
+        //             AllConversations: [newConversation, ...(prev.AllConversations || [])]
+        //         }
+        //     })
+        //     return { prevCon }
+        // },
+        onSuccess: (data, variables) => {
+            console.log(data)
+            qc.invalidateQueries({
+                queryKey: ["ChatList"]
             })
-            return { prevCon }
+            setSharedData({
+                id: variables,
+                conversationId: data.conversationId
+            })
         },
-        onError: (err, newTodo, context) => {
-            qc.setQueryData(["ChatList"], context?.prevCon)
-        },
-        onSettled: (data) => {
-            qc.invalidateQueries({ queryKey: ["ChatList"] })
-        }
+        // onError: (err, newTodo, context) => {
+        //     qc.setQueryData(["ChatList"], context?.prevCon)
+        // },
+        // onSettled: (data) => {
+        //     qc.invalidateQueries({ queryKey: ["ChatList"] })
+        // }
 
 
 
@@ -110,12 +120,7 @@ export default function NewChatDialog({ children, setSharedData }: {
 
 
     const handleStartChat = (friendId: string) => {
-        setSharedData({
-            id: friendId,
-            conversationId: ""
-        })
         mutation.mutate(friendId)
-        console.log("Start conversation with", friendId)
     }
 
     return (

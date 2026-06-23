@@ -8,7 +8,7 @@ import {
 import { MessageSquarePlus } from "lucide-react"
 import NewChatDialog from "@/features/chat/components/new-chat-dialog"
 import { ChatContext } from "@/features/chat/chat-context"
-import { useState } from "react"
+import { useContext } from "react"
 
 
 export type SidebarUser = {
@@ -23,10 +23,7 @@ interface HeaderProps {
 }
 
 export default function Header({ user }: HeaderProps) {
-    const [sharedData, setSharedData] = useState({
-        id: "",
-        conversationId: "",
-    })
+    const { setSharedData } = useContext(ChatContext)
 
     if (!user) {
         return (

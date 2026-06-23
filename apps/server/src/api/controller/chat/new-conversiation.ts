@@ -16,6 +16,35 @@ export async function newConversation(req: Request, res: Response) {
                 message: "cannot procceed without user id"
             });
         }
+        const existingConversation = await prisma.conversation.findFirst({
+            where: {
+                type: "DIRECT",
+                AND: [
+                    {
+                        participants: {
+                            some: {
+                                userId: session.user.id,
+                            },
+                        },
+                    },
+                    {
+                        participants: {
+                            some: {
+                                userId: id,
+                            },
+                        },
+                    },
+                ],
+            },
+        })
+
+        if (existingConversation) {
+            return res.status(200).json({
+                message: "Conversation already exists!",
+                conversationId: existingConversation.id
+            });
+        }
+
 
         const conversation = await prisma.conversation.create({
             data: {

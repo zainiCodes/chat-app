@@ -74,6 +74,7 @@ export default function ChatBody({ conversationId }: { conversationId: string })
         })
     }, [data?.allMessages.length])
     ///
+
     if (!data?.allMessages || data.allMessages.length === 0) {
         return (
             <div className='flex h-full w-full justify-center items-center'>

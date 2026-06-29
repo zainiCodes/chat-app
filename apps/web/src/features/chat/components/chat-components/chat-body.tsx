@@ -1,97 +1,133 @@
 import useGetMessagebyId, { Message } from '@/hooks/getMessagesbyid'
 import { authClient } from '@/lib/auth-client'
 import { socket } from '@/lib/socket-client'
-import { ScrollArea } from '@chat-app/ui/components/scroll-area'
 import { cn } from '@chat-app/ui/lib/utils'
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useQueryClient } from '@tanstack/react-query'
-
+import { useInView } from "react-intersection-observer"
 
 export default function ChatBody({ conversationId }: { conversationId: string }) {
     const loggedInUser = authClient.useSession()
     const loggedInUserId = loggedInUser.data?.user.id
-    const { data, isPending } = useGetMessagebyId(conversationId)
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useGetMessagebyId(conversationId)
     const queryClient = useQueryClient()
 
+    // --- Scroll container via callback ref so useInView gets the real element, not null ---
+    const [scrollEl, setScrollEl] = useState<HTMLDivElement | null>(null)
+    const scrollContainerRef = useCallback((node: HTMLDivElement | null) => {
+        setScrollEl(node)
+    }, [])
+
+    // --- Top sentinel: when it comes into view, load older messages ---
+    const { ref: topSentinelRef, inView } = useInView({
+        root: scrollEl,      // observe inside our scroll div, not the window
+        threshold: 0,
+    })
+
+    useEffect(() => {
+        if (inView && hasNextPage && !isFetchingNextPage) {
+            fetchNextPage()
+        }
+    }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage])
+
+    // --- Socket: incoming messages from other users ---
     useEffect(() => {
         if (!conversationId) return
 
         const handleMessage = (message: Message) => {
-            // Ignore messages for other conversations
-            if (message.conversationId !== conversationId) {
-                return
-            }
-
-            if (message.senderId === loggedInUserId) {
-                return
-            }
+            if (message.conversationId !== conversationId) return
+            if (message.senderId === loggedInUserId) return
 
             queryClient.setQueryData(
                 ["Messages", conversationId],
                 (old: any) => {
                     if (!old) return old
 
-                    // Prevent duplicates
-                    const exists = old.allMessages.some(
-                        (m: Message) => m.id === message.id
+                    const exists = old.pages.some((page: any) =>
+                        page.messages.some((m: Message) => m.id === message.id)
                     )
-
                     if (exists) return old
 
+                    // Append to the LAST page (most recent) — index 0 in desc-fetched order
                     return {
                         ...old,
-                        allMessages: [
-                            ...old.allMessages,
-                            message,
-                        ],
+                        pages: old.pages.map((page: any, index: number) => {
+                            if (index !== 0) return page
+                            return { ...page, messages: [...page.messages, message] }
+                        }),
                     }
                 }
             )
         }
 
         socket.on("new-message", handleMessage)
+        return () => { socket.off("new-message", handleMessage) }
+    }, [loggedInUser, conversationId, queryClient, loggedInUserId])
 
-        return () => {
-            socket.off("new-message", handleMessage)
-        }
-    }, [conversationId, queryClient, loggedInUser])
-
+    // --- Join / leave socket room ---
     useEffect(() => {
         if (!conversationId) return
-
         socket.emit("join-conversation", conversationId)
-
-        return () => {
-            socket.emit("leave-conversation", conversationId)
-        }
+        return () => { socket.emit("leave-conversation", conversationId) }
     }, [conversationId])
 
-    //for scrolling
+    // --- Auto-scroll to bottom only when first page gains new messages (new sends/receives) ---
     const bottomRef = useRef<HTMLDivElement>(null)
+    const firstPageLen = data?.pages[0]?.messages?.length ?? 0
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({
-            behavior: "smooth",
-        })
-    }, [data?.allMessages.length])
-    ///
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [firstPageLen])
 
-    if (!data?.allMessages || data.allMessages.length === 0) {
+    // --- Flatten pages into a chronological message list ---
+    // React Query appends newer pages at pages[0] (desc fetch), older pages at higher indices.
+    // Reversing pages gives us: oldest page first → newest page last → correct chat order.
+    const messages = data?.pages
+        .slice()
+        .reverse()
+        .flatMap((page) => page.messages)
+
+    // --- Loading state ---
+    if (isPending) {
         return (
-            <div className='flex h-full w-full justify-center items-center'>
-                No messages to show yet!
+            <div className="flex h-full w-full justify-center items-center text-muted-foreground">
+                Loading messages...
             </div>
         )
     }
+
+    // --- Empty state ---
+    if (!messages || messages.length === 0) {
+        return (
+            <div className="flex h-full w-full justify-center items-center text-muted-foreground">
+                No messages yet. Say hello! 👋
+            </div>
+        )
+    }
+
     return (
-        <ScrollArea className="w-full h-[calc(90vh-10rem)]">
+        <div
+            ref={scrollContainerRef}
+            className="w-full h-[calc(90vh-10rem)] overflow-y-auto"
+        >
             <div className="p-4 flex flex-col gap-2">
-                {data.allMessages.map((msg) => (
+
+                {/* Top sentinel — triggers fetchNextPage when scrolled to top */}
+                <div ref={topSentinelRef} />
+
+                {/* Older messages loading indicator */}
+                {isFetchingNextPage && (
+                    <div className="flex justify-center py-2 text-sm text-muted-foreground">
+                        Loading older messages...
+                    </div>
+                )}
+
+                {messages.map((msg) => (
                     <div
                         key={msg.id}
                         className={cn(
-                            msg.senderId === loggedInUserId
-                                ? "self-end"
-                                : "self-start"
+                            "flex",
+                            msg.senderId === loggedInUserId ? "justify-end" : "justify-start"
                         )}
                     >
                         <p className={cn(
@@ -99,15 +135,15 @@ export default function ChatBody({ conversationId }: { conversationId: string })
                                 ? "bg-primary text-accent"
                                 : "bg-gray-200",
                             "w-fit px-3 rounded-[16px] text-xl py-1"
-                        )}
-                        >
+                        )}>
                             {msg.content}
                         </p>
                     </div>
                 ))}
 
+                {/* Bottom anchor for auto-scroll */}
                 <div ref={bottomRef} />
             </div>
-        </ScrollArea>
+        </div>
     )
 }

@@ -25,30 +25,48 @@ export type Message = {
 
 type Response = {
     message: string;
-    allMessages: Message[];
+    messages: Message[];
+    nextCursor: string | null;
+    hasMore: boolean;
 };
 
-// ...rest of your hook
+
 
 function useGetMessagebyId(conversationId: string) {
-    const { data, isPending, error } = useQuery<Response>({
-        queryKey: ["Messages", conversationId],
-        enabled: !!conversationId,
-        queryFn: async () => {
-            const res = await fetch(`http://localhost:3000/api/get-messages/${conversationId}`, {
-                credentials: "include"
-            })
-            if (!res.ok) {
-                throw new Error("Failed to fetch Chats")
-            }
+    const { data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isPending,
+        error, } = useInfiniteQuery<Response>({
+            queryKey: ["Messages", conversationId],
+            getNextPageParam: (lastPage) => lastPage?.nextCursor,
+            initialPageParam: undefined,
+            queryFn: ({ pageParam }) => fetchNewMessages(conversationId, pageParam as string | undefined),
+            enabled: !!conversationId,
+            staleTime: 1000 * 60 * 5,
+        }
+        )
+    return { data, isPending, error, fetchNextPage, isFetchingNextPage, hasNextPage }
+}
 
-            const data: Response = await res.json()
+async function fetchNewMessages(conversationId: string, pageParam?: string) {
+    const url = new URL(
+        `http://localhost:3000/api/get-messages/${conversationId}`
+    );
 
-            return data
-        },
-        staleTime: 1000 * 60 * 5,
+    if (pageParam) {
+        url.searchParams.set("cursor", pageParam);
     }
-    )
-    return { data, isPending, error }
+    const res = await fetch(url.toString(), {
+        credentials: "include"
+    })
+    if (!res.ok) {
+        throw new Error("Failed to fetch Chats")
+    }
+
+    const data: Response = await res.json()
+
+    return data
 }
 export default useGetMessagebyId

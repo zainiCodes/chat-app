@@ -13,6 +13,7 @@ export async function getMessage(req: Request, res: Response) {
         }
         const prisma = createPrismaClient()
         const conversationId = req.params.conversationId as string
+        const cursor = req.query.cursor as number | undefined;
         if (!conversationId) {
             return res.status(401).json({
                 message: "Missing Conversation ID or User ID",
@@ -32,6 +33,7 @@ export async function getMessage(req: Request, res: Response) {
                 message: "User is not a participant in this conversation",
             });
         }
+        const PAGE_SIZE = 30;
 
         const allMessages = await prisma.message.findMany({
             where: {
@@ -39,9 +41,15 @@ export async function getMessage(req: Request, res: Response) {
                 isDeleted: false,
             },
             orderBy: {
-                seq: "asc",
+                seq: "desc",
             },
-            take: 50,
+            take: PAGE_SIZE + 1,
+            ...(cursor && {
+                cursor: {
+                    seq: BigInt(cursor),
+                },
+                skip: 1,
+            }),
             include: {
                 sender: {
                     select: {
@@ -51,22 +59,53 @@ export async function getMessage(req: Request, res: Response) {
                     },
                 },
             },
-        })
-        const serialized = JSON.parse(
+        });
+
+        // const allMessages = await prisma.message.findMany({
+        //     where: {
+        //         conversationId,
+        //         isDeleted: false,
+        //     },
+        //     orderBy: {
+        //         seq: "asc",
+        //     },
+        //     take: 50,
+        //     include: {
+        //         sender: {
+        //             select: {
+        //                 id: true,
+        //                 name: true,
+        //                 image: true,
+        //             },
+        //         },
+        //     },
+        // })
+        const hasMore = allMessages.length === PAGE_SIZE + 1;
+        // Cursor is the seq of the LAST item we're actually sending (index PAGE_SIZE-1).
+        // The next fetch will use skip:1 past that cursor, so it starts at PAGE_SIZE+1 onward.
+        const nextCursor = hasMore
+            ? allMessages[PAGE_SIZE - 1]?.seq.toString()
+            : null;
+
+        // Trim the extra sentinel before sending
+        const messagesToSend = hasMore ? allMessages.slice(0, PAGE_SIZE) : allMessages;
+
+        const serializedMessages = JSON.parse(
             JSON.stringify(
-                allMessages,
+                messagesToSend,
                 (_, value) =>
                     typeof value === "bigint"
                         ? Number(value)
                         : value
             )
-        )
-
+        );
 
         return res.status(200).json({
-            message: "Messages fetched success!",
-            allMessages: serialized
-        })
+            message: "Messages fetched successfully",
+            messages: serializedMessages.reverse(),
+            nextCursor,
+            hasMore,
+        });
 
 
     } catch (error) {

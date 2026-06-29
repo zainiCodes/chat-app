@@ -117,7 +117,7 @@ model ConversationParticipant {
 model Message {
   // FIX: seq is a BigInt autoincrement used as the cursor for keyset pagination.
   // Use seq instead of OFFSET for "load 50 messages before seq X".
-  seq            BigInt      @default(autoincrement())
+  seq            BigInt      @unique @default(autoincrement())
   id             String      @id @default(cuid())
   conversationId String
   senderId       String

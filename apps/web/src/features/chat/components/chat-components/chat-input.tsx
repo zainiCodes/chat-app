@@ -12,7 +12,7 @@ export default function ChatInput({ sharedData }: { sharedData: { id: string, co
     const qc = useQueryClient()
     const sendMessage = useMutation({
         mutationFn: async ({ conversationId, senderId, content }: { conversationId: string, senderId: string, content: string }) => {
-            await fetch("http://localhost:3000/api/send-message", {
+            const res = await fetch("http://localhost:3000/api/send-message", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -20,10 +20,18 @@ export default function ChatInput({ sharedData }: { sharedData: { id: string, co
                 credentials: "include",
                 body: JSON.stringify({ conversationId, senderId, content }),
             })
+            if (!res.ok) {
+                throw new Error("Failed to send message");
+            }
+            return res.json()
         },
         onMutate: async ({ conversationId, senderId, content }: { conversationId: string, senderId: string, content: string }) => {
             qc.cancelQueries({ queryKey: ["Messages", conversationId] })
             const prevChats = qc.getQueryData(["ChatList"])
+            const previousMessages = qc.getQueryData([
+                "Messages",
+                conversationId,
+            ]);
             qc.setQueryData(["Messages", conversationId], (prev: any) => {
                 if (!prev) return prev
                 const dummyMessage: Message = {
@@ -40,7 +48,7 @@ export default function ChatInput({ sharedData }: { sharedData: { id: string, co
                     replyToId: null,
                     senderId: senderId,
                     type: "TEXT",
-                    seq: prev.length + 1,
+                    seq: Number.MAX_SAFE_INTEGER,
                     sender: {
                         id: loggedInuser.session.user.id,
                         image: null,
@@ -49,21 +57,30 @@ export default function ChatInput({ sharedData }: { sharedData: { id: string, co
                 }
                 return {
                     ...prev,
-                    allMessages: [
-                        ...prev.allMessages,
-                        dummyMessage,
-                    ]
-                }
+                    pages: prev.pages.map((page: any, index: number) => {
+                        if (index !== 0) return page;
+
+                        return {
+                            ...page,
+                            messages: [...page.messages, dummyMessage],
+                        };
+                    }),
+                };
             })
 
-            return { prevChats }
+            return { prevChats, previousMessages }
         },
-        onError: (_err, _, context) => {
+        onError: (_err, variables, context) => {
+            if (context?.previousMessages) {
+                qc.setQueryData(["Messages", variables.conversationId], context.previousMessages)
+            }
             qc.setQueryData(["ChatList"], context?.prevChats)
         },
-        onSettled: (_, _var, data) => {
-            qc.invalidateQueries({ queryKey: ["Messages", data.conversationId] })
-            qc.invalidateQueries({ queryKey: ["ChatList"] })
+        onSettled: (_data, _error, variables) => {
+
+            qc.invalidateQueries({
+                queryKey: ["ChatList"],
+            });
         }
 
     })

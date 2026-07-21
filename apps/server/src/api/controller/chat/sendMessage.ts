@@ -23,6 +23,16 @@ export async function sendMessage(req: Request, res: Response) {
                 senderId: senderId,
             }
         })
+
+        await prisma.conversation.update({
+            where: {
+                id: conversationId,
+            },
+            data: {
+                updatedAt: new Date(),
+            },
+        })
+
         const messageData = JSON.parse(
             JSON.stringify(
                 message,

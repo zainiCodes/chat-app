@@ -61,7 +61,7 @@ export async function chatList(req: Request, res: Response) {
 
             orderBy: {
                 conversation: {
-                    updatedAt: "desc",
+                    updatedAt: "desc"
                 },
             },
         })

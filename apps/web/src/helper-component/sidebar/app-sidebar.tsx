@@ -68,7 +68,7 @@ export function AppSidebar({ renderLink }: AppSidebarProps) {
                 </div>
                 <Header user={user} />
             </SidebarHeader>
-            <Separator className="h-[2px] mx-3 mb-4 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:w-4" />
+            <Separator className="h-0.5 mx-3 mb-4 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:w-4" />
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupContent>
